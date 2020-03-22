@@ -14,6 +14,9 @@ class TriangleGameObject() : AbstractGameObject() {
 
     private val colourRGBA = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
 
+    /**
+     * TriangleGameObject init block which sets the parameters in the abstract base class
+     */
     init {
         super.SetParameters(vertexCoordsArray, indicesArray, colourRGBA)
     }

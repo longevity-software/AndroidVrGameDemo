@@ -7,6 +7,9 @@ class VrGlSurfaceView(context: Context) : GLSurfaceView(context){
 
     private val mRenderer: VrRenderer
 
+    /**
+     * VrGlSurfaceView init block which sets up the OpenGl version and renderer.
+     */
     init {
 
         // use openGL ES2.0

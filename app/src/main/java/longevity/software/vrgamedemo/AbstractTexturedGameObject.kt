@@ -6,38 +6,44 @@ import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import java.nio.ShortBuffer
 
-abstract class AbstractGameObject() {
+abstract class AbstractTexturedGameObject {
 
-    // constants.
+    // constants
     private val COORDS_PER_VERTEX = 3
+    private val UVS_PER_VERTEX = 2
     private val BYTES_PER_FLOAT = 4
     private val BYTES_PER_SHORT = 2
 
     private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
+    private val uvStride: Int = UVS_PER_VERTEX * BYTES_PER_FLOAT
 
     private val vertexShaderCode =
     // This matrix member variable provides a hook to manipulate
         // the coordinates of the objects that use this vertex shader
         "uniform mat4 uMVPMatrix;" +
                 "attribute vec4 vPosition;" +
+                "attribute vec2 vTexture;" +
+                "varying vec2 vTex;" +
                 "void main() {" +
                 // the matrix must be included as a modifier of gl_Position
                 // Note that the uMVPMatrix factor *must be first* in order
                 // for the matrix multiplication product to be correct.
-                "  gl_Position = uMVPMatrix * vPosition;" +
+                "gl_Position = uMVPMatrix * vPosition;" +
+                "vTex = vTexture;" +
                 "}"
 
     private val fragmentShaderCode =
         "precision mediump float;" +
-                "uniform vec4 vColor;" +
+                "uniform sampler2D uTexture;" +
+                "varying vec2 vTex;" +
                 "void main() {" +
-                "  gl_FragColor = vColor;" +
+                "  gl_FragColor = texture2D(uTexture, vTex);" +
                 "}"
 
-    // Parameters which are set in the setParameter function.
-    private lateinit var colourRGBA: FloatArray
+    // parameters set by the setParameters function
     private lateinit var vertexBuffer: FloatBuffer
     private lateinit var indicesBuffer: ShortBuffer
+    private lateinit var uvBuffer: FloatBuffer
 
     // private variables
     private var mProgram: Int
@@ -45,7 +51,7 @@ abstract class AbstractGameObject() {
     private var mParametersHaveBeenSet: Boolean
 
     /**
-     * AbstractGameObject init block which creates the program and loads shaders.
+     * AbstractTexturedGameObject init block which loads shaders and creates the program.
      */
     init {
 
@@ -65,9 +71,7 @@ abstract class AbstractGameObject() {
      * Function to set the parameters which are specific to each class which
      * inherits from this abstract class
      */
-    fun SetParameters(vertices: FloatArray, indices: ShortArray, colours: FloatArray) {
-
-        // set the buffers with the arrays passed in.
+    fun SetParameters(vertices: FloatArray, indices: ShortArray, uvs: FloatArray) {
         vertexBuffer =
             ByteBuffer.allocateDirect(vertices.size * BYTES_PER_FLOAT).run {
                 order(ByteOrder.nativeOrder())
@@ -86,10 +90,14 @@ abstract class AbstractGameObject() {
                 }
             }
 
-        colourRGBA = colours
+        uvBuffer = ByteBuffer.allocateDirect(uvs.size * BYTES_PER_FLOAT).run {
+            order(ByteOrder.nativeOrder())
+            asFloatBuffer().apply {
+                put(uvs)
+                position(0)
+            }
+        }
 
-        // set the local copy of the number of indices and the flag
-        // indicating that the parameters have been set
         mIndexCount = indices.size
         mParametersHaveBeenSet = true
     }
@@ -104,12 +112,11 @@ abstract class AbstractGameObject() {
             GLES20.glCompileShader(shader)
         }
     }
-
     /**
-     * Function which draws the model using the model view projection matrix passed if
-     * the parameters have been set.
+     * Function which draws the model using the model view projection matrix passed
+     * and textures it with the passed texture reference if the parameters have been set.
      */
-    fun draw(mvpMatrix: FloatArray) {
+    fun draw(mvpMatrix: FloatArray, texture: Int) {
 
         if (mParametersHaveBeenSet) {
 
@@ -126,20 +133,38 @@ abstract class AbstractGameObject() {
                     vertexBuffer
                 )
 
-                GLES20.glGetUniformLocation(mProgram, "vColor").also { colourHandle ->
-                    GLES20.glUniform4fv(colourHandle, 1, colourRGBA, 0)
+                GLES20.glGetAttribLocation(mProgram, "vTexture").also {
+                    GLES20.glEnableVertexAttribArray(it)
+                    GLES20.glVertexAttribPointer(
+                        it,
+                        UVS_PER_VERTEX,
+                        GLES20.GL_FLOAT,
+                        false,
+                        uvStride,
+                        uvBuffer
+                    )
+
+                    GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture)
+
+                    GLES20.glGetUniformLocation(mProgram, "uTexture").also {
+                        uvHandle -> GLES20.glUniform1i(uvHandle, 0)
+                    }
+
+                    GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also {
+                            matrixHandle -> GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mvpMatrix, 0)
+                    }
+
+                    GLES20.glDrawElements(
+                        GLES20.GL_TRIANGLES,
+                        mIndexCount,
+                        GLES20.GL_UNSIGNED_SHORT,
+                        indicesBuffer
+                    )
+
+                    GLES20.glDisableVertexAttribArray(it)
                 }
 
-                GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
-                    GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mvpMatrix, 0)
-                }
-
-                GLES20.glDrawElements(
-                    GLES20.GL_TRIANGLES,
-                    mIndexCount,
-                    GLES20.GL_UNSIGNED_SHORT,
-                    indicesBuffer
-                )
                 GLES20.glDisableVertexAttribArray(it)
             }
         }
