@@ -41,6 +41,10 @@ class VrRenderer : GLSurfaceView.Renderer {
     private lateinit var mTextureBufferLeft: IntBuffer
     private lateinit var mTextureBufferRight: IntBuffer
 
+    // screen width and height variables
+    private var mScreenWidth: Int = 0
+    private var mScreenHeight: Int = 0
+
     /**
      * Function called when the surface is created.
      * This function sets up the Quad's, camera's and
@@ -138,8 +142,8 @@ class VrRenderer : GLSurfaceView.Renderer {
      */
     override fun onSurfaceChanged(unused: GL10?, width: Int, height: Int) {
 
-        // reset the viewport
-        GLES20.glViewport(0, 0, width, height)
+        mScreenWidth = width
+        mScreenHeight = height
     }
 
     /**
@@ -165,6 +169,9 @@ class VrRenderer : GLSurfaceView.Renderer {
         val identityMatrix: FloatArray = FloatArray(16).also {
             Matrix.setIdentityM(it, 0)
         }
+
+        // set the viewport back to the screen size
+        GLES20.glViewport(0, 0, mScreenWidth, mScreenHeight)
 
         // set the clear colour for rendering the quads and clear the colour buffer bit.
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f)
@@ -198,6 +205,9 @@ class VrRenderer : GLSurfaceView.Renderer {
         // check if framebuffer is complete
         if (GLES20.GL_FRAMEBUFFER_COMPLETE == GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER))
         {
+            // set the viewport to render to the texture
+            GLES20.glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
+
             // TODO - temporary check to make each side a different colour
             if (frameBuffer == mFrameBuffer[LEFT_FRAMEBUFFER_INDEX]) {
                 GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f)
