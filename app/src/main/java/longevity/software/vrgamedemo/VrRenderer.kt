@@ -11,11 +11,9 @@ import javax.microedition.khronos.opengles.GL10
 
 class VrRenderer : GLSurfaceView.Renderer {
 
-    // matrices for future use.
-    private val modelViewProjectionMatrix = FloatArray(16)
-    private val modelMatrix = FloatArray(16)
-    private val viewMatrix = FloatArray(16)
-    private val projectionMatrix = FloatArray(16)
+    // Matrices for generating the view projection portion of the model view projection matrix
+    private val mViewMatrix = FloatArray(16)
+    private val mProjectionMatrix = FloatArray(16)
 
     // Quads which fill the left and right side of the screen
     private lateinit var mLeftQuad: TexturedQuad
@@ -41,6 +39,13 @@ class VrRenderer : GLSurfaceView.Renderer {
     private lateinit var mTextureBufferLeft: IntBuffer
     private lateinit var mTextureBufferRight: IntBuffer
 
+    // Lists of the Game Objects in the scene
+    private val mGameObjectList = mutableListOf<AbstractGameObject>()
+
+    // screen width and height variables
+    private var mScreenWidth: Int = 0
+    private var mScreenHeight: Int = 0
+
     /**
      * Function called when the surface is created.
      * This function sets up the Quad's, camera's and
@@ -53,11 +58,11 @@ class VrRenderer : GLSurfaceView.Renderer {
         mRightQuad = TexturedQuad(false)
 
         // initialise the two cameras to the same values for now
-        mRightCamera = GameCamera(0.0f, 1.0f, 0.0f,
+        mRightCamera = GameCamera(1.0f, 0.0f, -3.0f,
                                 0.0f, 0.0f, 1.0f,
                                 0.0f, 1.0f, 0.0f)
 
-        mLeftCamera = GameCamera(0.0f, 1.0f, 0.0f,
+        mLeftCamera = GameCamera(-1.0f, 0.0f, -3.0f,
             0.0f, 0.0f, 1.0f,
             0.0f, 1.0f, 0.0f)
 
@@ -82,7 +87,7 @@ class VrRenderer : GLSurfaceView.Renderer {
 
         // create it
         // create empty int buffer first
-        var bufRight: IntArray = IntArray(TEXTURE_WIDTH * TEXTURE_HEIGHT)
+        val bufRight = IntArray(TEXTURE_WIDTH * TEXTURE_HEIGHT)
 
         mTextureBufferRight = ByteBuffer.allocateDirect(bufRight.size * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder()).asIntBuffer()
 
@@ -111,7 +116,7 @@ class VrRenderer : GLSurfaceView.Renderer {
 
         // create it
         // create empty int buffer first
-        var bufLeft: IntArray = IntArray(TEXTURE_WIDTH * TEXTURE_HEIGHT)
+        val bufLeft = IntArray(TEXTURE_WIDTH * TEXTURE_HEIGHT)
 
         mTextureBufferLeft = ByteBuffer.allocateDirect(bufLeft.size * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder()).asIntBuffer()
 
@@ -131,6 +136,18 @@ class VrRenderer : GLSurfaceView.Renderer {
 
         // set the background frame colour to black
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+
+        // initialise the game objects which will be drawn
+        mGameObjectList.add(TriangleGameObject(0))
+        mGameObjectList.add(TriangleGameObject(1))
+
+        // set the position of these objects.
+        mGameObjectList[0].setPosition(Vector3Float(1.0f, -1.0f, 0.0f))
+        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 1.0f, 0.0f))
+
+        // set up the projection matrix for rendering to the framebuffers
+        val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1.0f, 1.0f, 1.0f, 10.0f)
     }
 
     /**
@@ -138,8 +155,8 @@ class VrRenderer : GLSurfaceView.Renderer {
      */
     override fun onSurfaceChanged(unused: GL10?, width: Int, height: Int) {
 
-        // reset the viewport
-        GLES20.glViewport(0, 0, width, height)
+        mScreenWidth = width
+        mScreenHeight = height
     }
 
     /**
@@ -166,13 +183,17 @@ class VrRenderer : GLSurfaceView.Renderer {
             Matrix.setIdentityM(it, 0)
         }
 
-        // set the clear colour for rendering the quads and clear the colour buffer bit.
-        GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f)
+        // set the viewport back to the screen size
+        GLES20.glViewport(0, 0, mScreenWidth, mScreenHeight)
+
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
         // draw the quad with the generated textures.
         mLeftQuad.draw(identityMatrix, mRenderTexture[LEFT_FRAMEBUFFER_INDEX])
         mRightQuad.draw(identityMatrix, mRenderTexture[RIGHT_FRAMEBUFFER_INDEX])
+
+        //drawScene(mLeftCamera);
     }
 
     /**
@@ -198,15 +219,8 @@ class VrRenderer : GLSurfaceView.Renderer {
         // check if framebuffer is complete
         if (GLES20.GL_FRAMEBUFFER_COMPLETE == GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER))
         {
-            // TODO - temporary check to make each side a different colour
-            if (frameBuffer == mFrameBuffer[LEFT_FRAMEBUFFER_INDEX]) {
-                GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f)
-            } else {
-                GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f)
-            }
-
-            // clear the colour buffer bit before we start drawing
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+            // set the viewport to render to the texture
+            GLES20.glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
 
             // do the actual drawing of the scene
             drawScene(camera)
@@ -221,6 +235,22 @@ class VrRenderer : GLSurfaceView.Renderer {
      */
     private fun drawScene(camera: GameCamera) {
 
-        // TODO - populate this with draw calls.
+        val viewProjectionMatrix = FloatArray(16)
+
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+
+        // set the camera based on the passed GameCamera
+        Matrix.setLookAtM(mViewMatrix, 0,
+            camera.getPositionX(), camera.getPositionY(), camera.getPositionZ(),
+            camera.getLookPositionX(), camera.getLookPositionY(), camera.getLookPositionZ(),
+            camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ())
+
+        // create a view projection matrix
+        Matrix.multiplyMM(viewProjectionMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0)
+
+        // draw all the game objects in the list.
+        for (gameObject in mGameObjectList) {
+            gameObject.draw(viewProjectionMatrix)
+        }
     }
 }

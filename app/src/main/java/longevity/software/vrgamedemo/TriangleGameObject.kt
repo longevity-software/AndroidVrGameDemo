@@ -1,6 +1,6 @@
 package longevity.software.vrgamedemo
 
-class TriangleGameObject() : AbstractGameObject() {
+class TriangleGameObject(colour: Int) : AbstractGameObject() {
 
     private val vertexCoordsArray: FloatArray = floatArrayOf(    // in counterclockwise order:
         0.0f, 0.622008459f, 0.0f,      // top
@@ -12,12 +12,17 @@ class TriangleGameObject() : AbstractGameObject() {
         0, 1, 2
     )
 
-    private val colourRGBA = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
+    private val greenRGBA = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
+    private val purpleRGBA = floatArrayOf(0.63671875f, 0.22265625f, 0.76953125f, 1.0f)
 
     /**
      * TriangleGameObject init block which sets the parameters in the abstract base class
      */
     init {
-        super.SetParameters(vertexCoordsArray, indicesArray, colourRGBA)
+        if (colour == 0) {
+            super.SetParameters(vertexCoordsArray, indicesArray, purpleRGBA)
+        } else {
+            super.SetParameters(vertexCoordsArray, indicesArray, greenRGBA)
+        }
     }
 }
