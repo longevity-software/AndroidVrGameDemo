@@ -8,7 +8,7 @@ import android.hardware.SensorManager
 import android.opengl.Matrix
 import java.util.concurrent.locks.ReentrantLock
 
-class DeviceRotationSensor(context: Context): SensorEventListener {
+class DeviceRotationSensor(context: Context): SensorEventListener, LookControlInterface {
 
     // lock to prevent the rotation matrix from being read and written to at the same time
     private val mRotationLock = ReentrantLock()
@@ -89,9 +89,10 @@ class DeviceRotationSensor(context: Context): SensorEventListener {
     }
 
     /**
-     * function to return a copy of the calculated rotation matrix.
+     * overriden function from the LookControlInterface
+     * returns a copy of the calculated rotation matrix.
      */
-    fun getLatestRotationMatrix(): FloatArray {
+    override fun getLatestRotationMatrix(): FloatArray {
 
         // lock while we cope the rotation matrix
         mRotationLock.lock()

@@ -9,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(deviceRotationSensor: DeviceRotationSensor) : GLSurfaceView.Renderer {
+class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mViewMatrix = FloatArray(16)
@@ -46,7 +46,7 @@ class VrRenderer(deviceRotationSensor: DeviceRotationSensor) : GLSurfaceView.Ren
     private var mScreenWidth: Int = 0
     private var mScreenHeight: Int = 0
 
-    private val mDeviceRotationSensor = deviceRotationSensor
+    private val mControlHub = controlHub
 
     /**
      * Function called when the surface is created.
@@ -170,7 +170,7 @@ class VrRenderer(deviceRotationSensor: DeviceRotationSensor) : GLSurfaceView.Ren
 
         // update the camera's based on the device rotation
         // first get the rotation.
-        val rotMat = mDeviceRotationSensor.getLatestRotationMatrix()
+        val rotMat = mControlHub.getLookRotationMatrix()
 
         // apply the rotation to each camera
         mLeftCamera.setCameraRotation(rotMat)

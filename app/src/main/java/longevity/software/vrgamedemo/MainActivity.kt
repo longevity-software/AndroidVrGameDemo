@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mDeviceRotationSensor: DeviceRotationSensor
+    private lateinit var mPlayerControlHub: GameControlHub
 
     /**
      * function called when the Main activity is created.
@@ -23,8 +24,10 @@ class MainActivity : AppCompatActivity() {
         // TODO - this currently does not work
         mDeviceRotationSensor = DeviceRotationSensor(this)
 
+        mPlayerControlHub = GameControlHub(mDeviceRotationSensor)
+
         // set the content to our VrGlSurfaceView
-        setContentView(VrGlSurfaceView(this, mDeviceRotationSensor))
+        setContentView(VrGlSurfaceView(this, mPlayerControlHub))
     }
 
     /**
