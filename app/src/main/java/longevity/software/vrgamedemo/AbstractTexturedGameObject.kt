@@ -1,6 +1,7 @@
 package longevity.software.vrgamedemo
 
 import android.opengl.GLES20
+import android.opengl.Matrix
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -50,12 +51,18 @@ abstract class AbstractTexturedGameObject {
     private var mIndexCount: Int = 0
     private var mParametersHaveBeenSet: Boolean
 
+    // variables used to generate the model matrix
+    private var mPosition: Vector3Float
+
     /**
      * AbstractTexturedGameObject init block which loads shaders and creates the program.
      */
     init {
 
         mParametersHaveBeenSet = false
+
+        // set the initial position.
+        mPosition = Vector3Float(0.0f, 0.0f, 0.0f)
 
         val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
@@ -116,7 +123,7 @@ abstract class AbstractTexturedGameObject {
      * Function which draws the model using the model view projection matrix passed
      * and textures it with the passed texture reference if the parameters have been set.
      */
-    fun draw(mvpMatrix: FloatArray, texture: Int) {
+    fun draw(vpMatrix: FloatArray, texture: Int) {
 
         if (mParametersHaveBeenSet) {
 
@@ -150,6 +157,15 @@ abstract class AbstractTexturedGameObject {
                     GLES20.glGetUniformLocation(mProgram, "uTexture").also {
                         uvHandle -> GLES20.glUniform1i(uvHandle, 0)
                     }
+
+                    // generate the model matrix Note Currently this is only a translation
+                    val translationMatrix = FloatArray(16)
+                    Matrix.setIdentityM(translationMatrix, 0)   // ensure we are starting from identity
+                    Matrix.translateM(translationMatrix, 0, mPosition.getX(), mPosition.getY(), mPosition.getZ())
+
+                    // add the model matrix to the view projection matrix to create the model view projection matrix.
+                    val mvpMatrix = FloatArray(16)
+                    Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, translationMatrix, 0)
 
                     GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also {
                             matrixHandle -> GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mvpMatrix, 0)
