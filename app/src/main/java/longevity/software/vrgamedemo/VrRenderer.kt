@@ -9,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer : GLSurfaceView.Renderer {
+class VrRenderer(deviceRotationSensor: DeviceRotationSensor) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mViewMatrix = FloatArray(16)
@@ -45,6 +45,8 @@ class VrRenderer : GLSurfaceView.Renderer {
     // screen width and height variables
     private var mScreenWidth: Int = 0
     private var mScreenHeight: Int = 0
+
+    private val mDeviceRotationSensor = deviceRotationSensor
 
     /**
      * Function called when the surface is created.
@@ -165,6 +167,14 @@ class VrRenderer : GLSurfaceView.Renderer {
      * draw the textured quads to the screen
      */
     override fun onDrawFrame(unused: GL10?) {
+
+        // update the camera's based on the device rotation
+        // first get the rotation.
+        val rotMat = mDeviceRotationSensor.getLatestRotationMatrix()
+
+        // apply the rotation to each camera
+        mLeftCamera.setCameraRotation(rotMat)
+        mRightCamera.setCameraRotation(rotMat)
 
         // Draw the left side
         drawSceneToFrameBuffer(mLeftCamera,

@@ -3,7 +3,7 @@ package longevity.software.vrgamedemo
 import android.content.Context
 import android.opengl.GLSurfaceView
 
-class VrGlSurfaceView(context: Context) : GLSurfaceView(context){
+class VrGlSurfaceView(context: Context, deviceRotationSensor: DeviceRotationSensor) : GLSurfaceView(context){
 
     private val mRenderer: VrRenderer
 
@@ -15,8 +15,8 @@ class VrGlSurfaceView(context: Context) : GLSurfaceView(context){
         // use openGL ES2.0
         setEGLContextClientVersion(2)
 
-        // instantiate the renderer and set it to be used
-        mRenderer = VrRenderer()
+        // instantiate the renderer, pass it the device rotation sensor and set it to be used
+        mRenderer = VrRenderer(deviceRotationSensor)
         setRenderer(mRenderer)
     }
 }
