@@ -46,6 +46,7 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
     private var mScreenWidth: Int = 0
     private var mScreenHeight: Int = 0
 
+    // local game control hub pass into the constructor
     private val mControlHub = controlHub
 
     /**
@@ -141,11 +142,15 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
 
         // initialise the game objects which will be drawn
         mGameObjectList.add(TriangleGameObject(0))
+        mGameObjectList.add(TriangleGameObject(0))
+        mGameObjectList.add(TriangleGameObject(1))
         mGameObjectList.add(TriangleGameObject(1))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(1.0f, -1.0f, 0.0f))
-        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 1.0f, 0.0f))
+        mGameObjectList[0].setPosition(Vector3Float(1.0f, 0.0f, 0.0f))
+        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 0.0f, 0.0f))
+        mGameObjectList[2].setPosition(Vector3Float(1.0f, 0.0f, -6.0f))
+        mGameObjectList[3].setPosition(Vector3Float(-1.0f, 0.0f, -6.0f))
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
@@ -176,6 +181,11 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
         mLeftCamera.setCameraRotation(rotMat)
         mRightCamera.setCameraRotation(rotMat)
 
+        // adjust the two cameras using the move translation matrix
+        val offset = mControlHub.getMoveTranslationMatrix()
+        mLeftCamera.adjustPosition(offset.get(12), offset.get(13), offset.get(14))
+        mRightCamera.adjustPosition(offset.get(12), offset.get(13), offset.get(14))
+
         // Draw the left side
         drawSceneToFrameBuffer(mLeftCamera,
             mFrameBuffer[LEFT_FRAMEBUFFER_INDEX],
@@ -202,8 +212,6 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
         // draw the quad with the generated textures.
         mLeftQuad.draw(identityMatrix, mRenderTexture[LEFT_FRAMEBUFFER_INDEX])
         mRightQuad.draw(identityMatrix, mRenderTexture[RIGHT_FRAMEBUFFER_INDEX])
-
-        //drawScene(mLeftCamera);
     }
 
     /**

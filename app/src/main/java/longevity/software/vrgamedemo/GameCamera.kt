@@ -88,6 +88,15 @@ class GameCamera (positionX: Float,
     }
 
     /**
+     * function to adjust the camera's position by the passed delta
+     */
+    fun adjustPosition(deltaX: Float, deltaY: Float, deltaZ: Float) {
+        mPositionX += deltaX
+        mPositionY += deltaY
+        mPositionZ += deltaZ
+    }
+
+    /**
      * function to update the direction the camera is
      * looking based on the passed in rotation matrix.
      */
@@ -105,7 +114,18 @@ class GameCamera (positionX: Float,
         // and the up vector to default
         Matrix.translateM(up, 0, 0.0f, 1.0f, 0.0f)
 
-        // TODO - rotate the forward and up matrices using the passed rotation matrix
-        // TODO - then update the local look direction
+        // rotate the forward and up matrices using the passed rotation matrix
+        Matrix.multiplyMM(up, 0, rotMat, 0, up, 0)
+        Matrix.multiplyMM(forward, 0, rotMat, 0, forward, 0)
+
+        // then update the local look direction
+        mLookDirectionX = forward.get(12)
+        mLookDirectionY = forward.get(13)
+        mLookDirectionZ = forward.get(14)
+
+        // and up direction
+        mUpDirectionX = up.get(12)
+        mUpDirectionY = up.get(13)
+        mUpDirectionZ = up.get(14)
     }
 }

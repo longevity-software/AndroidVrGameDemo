@@ -1,12 +1,15 @@
 package longevity.software.vrgamedemo
 
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mDeviceRotationSensor: DeviceRotationSensor
+    private lateinit var mXboxController: XboxController
     private lateinit var mPlayerControlHub: GameControlHub
 
     /**
@@ -24,7 +27,11 @@ class MainActivity : AppCompatActivity() {
         // TODO - this currently does not work
         mDeviceRotationSensor = DeviceRotationSensor(this)
 
-        mPlayerControlHub = GameControlHub(mDeviceRotationSensor)
+        // initialise the xbox controller class.
+        mXboxController = XboxController()
+
+        // the same xbox controller class implements the look, move and button interfaces.
+        mPlayerControlHub = GameControlHub(mXboxController, mXboxController, mXboxController)
 
         // set the content to our VrGlSurfaceView
         setContentView(VrGlSurfaceView(this, mPlayerControlHub))
@@ -46,5 +53,31 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
 
         mDeviceRotationSensor.unregisterListeners()
+    }
+
+    /**
+     * Overridden onKeyDown function which calls the XboxController class's onKeyDown function to process the event
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+        if ( true == mXboxController.onKeyDown(keyCode, event) ) {
+            return true
+        }
+        else {
+            return super.onKeyDown(keyCode, event)
+        }
+    }
+
+    /**
+     * Overridden onGenericMotionEvent function which calls the
+     * XboxController class's onGenericMotionEvent function to process the event
+     */
+    override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
+
+        if (true == mXboxController.onGenericMotionEvent(event)) {
+            return true
+        } else {
+            return super.onGenericMotionEvent(event)
+        }
     }
 }
