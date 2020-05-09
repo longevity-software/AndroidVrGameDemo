@@ -2,5 +2,6 @@ package longevity.software.vrgamedemo
 
 interface LookControlInterface {
 
-    fun getLatestRotationMatrix(): FloatArray
+    fun getLatestPitch(): Float
+    fun getLatestYaw(): Float
 }

@@ -1,6 +1,5 @@
 package longevity.software.vrgamedemo
 
-import android.opengl.Matrix
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -14,8 +13,8 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     private val mButtonLock = ReentrantLock()
 
     // constants for translation scaling
-    private val X_TRANSLATION_SCALE = -50.0f
-    private val Z_TRANSLATION_SCALE = -50.0f
+    private val X_TRANSLATION_SCALE = -30.0f
+    private val Z_TRANSLATION_SCALE = -30.0f
 
     // constants for the look rotation
     private val MAX_PITCH_ANGLE = 90.0f
@@ -24,57 +23,74 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     private val YAW_STEP = -1.0f
 
     // translation, look and button tracking variables
-    private var mTranslationMatrix = FloatArray(16)
-    private var mRotationMatrix = FloatArray(16)
+    private var mForwardBackDelta: Float
+    private var mLeftRightDelta: Float
     private var mPitchAngle: Float
     private var mPitchDelta: Float
     private var mYawAngle: Float
     private var mYawDelta: Float
+    private var mRollAngle: Float   // there is no roll delta as the xbox controller doesn't change this value
     private var mActionButtonPressed: Boolean
 
     /**
      * init function initialises the translation and rotation matrices to an identity matrix.
      */
     init {
-        // ensure matrices are set to identity values.
-        Matrix.setIdentityM(mTranslationMatrix, 0)
-        Matrix.setIdentityM(mRotationMatrix, 0)
-
         // set the initial rotation angles and deltas
         mPitchAngle = 0.0f
         mPitchDelta = 0.0f
         mYawAngle = 0.0f
         mYawDelta = 0.0f
+        mRollAngle = 0.0f
+
+        // set the initial movement deltas
+        mForwardBackDelta = 0.0f
+        mLeftRightDelta = 0.0f
 
         // action button is initially not pressed
         mActionButtonPressed = false
     }
 
     /**
-     * overriden function from the MoveControlInterface
-     * returns a copy of the calculated translation matrix.
+     * overriden function from the M0oveControlInterface
+     * returns a copy of the Forward/Backwards delta
      */
-    override fun getLatestTranslationMatrix(): FloatArray {
+    override fun getLatestForwardBackwardsDelta(): Float {
 
-        // lock while we cope the translation matrix
+        // lock while taking a copy
         mTranslationLock.lock()
 
-        // take a copy
-        val tranMat = mTranslationMatrix
+        val fb = mForwardBackDelta
 
         // unlock
         mTranslationLock.unlock()
 
-        return tranMat
+        return fb
+    }
+
+    /**
+     * overriden function from the M0oveControlInterface
+     * returns a copy of the Left/Right delta
+     */
+    override fun getLatestLeftRightDelta(): Float {
+
+        // lock while taking a copy
+        mTranslationLock.lock()
+
+        val lr = mLeftRightDelta
+
+        // unlock
+        mTranslationLock.unlock()
+
+        return lr
     }
 
     /**
      * overriden function from the LookControlInterface
-     * returns a copy of the calculated rotation matrix.
+     * returns a copy of the calculated pitch.
      */
-    override fun getLatestRotationMatrix(): FloatArray {
+    override fun getLatestPitch(): Float {
 
-        // lock while we use the delta values and update the rotation matrix
         mRotationLock.lock()
 
         // update the pitch angle with the current delta
@@ -89,6 +105,22 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
             }
         }
 
+        // take a copy
+        val pitch = mPitchAngle
+
+        mRotationLock.unlock()
+
+        return pitch
+    }
+
+    /**
+     * overriden function from the LookControlInterface
+     * returns a copy of the calculated yaw.
+     */
+    override fun getLatestYaw(): Float {
+
+        mRotationLock.lock()
+
         // update the yaw angle with the current delta
         mYawAngle += mYawDelta
 
@@ -99,18 +131,12 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
             mYawAngle -= MAX_YAW_ANGLE
         }
 
-        // generate the rotation matrix
-        // pitch is first, followed by yaw.
-        Matrix.setRotateM(mRotationMatrix, 0, mPitchAngle, 1.0f, 0.0f, 0.0f)
-        Matrix.rotateM(mRotationMatrix, 0, mYawAngle, 0.0f, 1.0f, 0.0f)
-
         // take a copy
-        val rotMat = mRotationMatrix
+        val yaw = mYawAngle
 
-        // unlock
         mRotationLock.unlock()
 
-        return rotMat
+        return yaw
     }
 
     /**
@@ -205,7 +231,7 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
 
         // get the left stick data
         val leftX: Float = getCenteredAxis(event, inputDevice, MotionEvent.AXIS_X, historyPos)
-        var leftZ: Float = getCenteredAxis(event, inputDevice, MotionEvent.AXIS_Y, historyPos)
+        val leftZ: Float = getCenteredAxis(event, inputDevice, MotionEvent.AXIS_Y, historyPos)
 
         // get the right stick data
         val rightX: Float = getCenteredAxis(event, inputDevice, MotionEvent.AXIS_Z, historyPos)
@@ -214,9 +240,9 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         // lock while the translation matrix is being updated
         mTranslationLock.lock()
 
-        // get the move delta and use to generate translation matrix
-        Matrix.setIdentityM(mTranslationMatrix, 0)
-        Matrix.translateM(mTranslationMatrix, 0, (leftX / X_TRANSLATION_SCALE), 0.0f, (leftZ / Z_TRANSLATION_SCALE))
+        // get the move delta
+        mForwardBackDelta = (leftZ / Z_TRANSLATION_SCALE)
+        mLeftRightDelta = (leftX / X_TRANSLATION_SCALE)
 
         mTranslationLock.unlock()
 

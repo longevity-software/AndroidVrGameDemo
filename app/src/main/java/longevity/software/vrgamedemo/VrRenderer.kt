@@ -9,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
+class VrRenderer(vis: PlayerVision) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mViewMatrix = FloatArray(16)
@@ -20,8 +20,8 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
     private lateinit var mRightQuad: TexturedQuad
 
     // Camera definitions.
-    private lateinit var mRightCamera: GameCamera
-    private lateinit var mLeftCamera: GameCamera
+    private var mRightCamera = vis.getRightEyeCamera()
+    private var mLeftCamera = vis.getLeftEyeCamera()
 
     // framebuffer constants
     private val TEXTURE_WIDTH: Int = 768
@@ -46,9 +46,6 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
     private var mScreenWidth: Int = 0
     private var mScreenHeight: Int = 0
 
-    // local game control hub pass into the constructor
-    private val mControlHub = controlHub
-
     /**
      * Function called when the surface is created.
      * This function sets up the Quad's, camera's and
@@ -59,15 +56,6 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
         // initialise the two Quads
         mLeftQuad = TexturedQuad(true)
         mRightQuad = TexturedQuad(false)
-
-        // initialise the two cameras to the same values for now
-        mRightCamera = GameCamera(1.0f, 0.0f, -3.0f,
-                                0.0f, 0.0f, 1.0f,
-                                0.0f, 1.0f, 0.0f)
-
-        mLeftCamera = GameCamera(-1.0f, 0.0f, -3.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 1.0f, 0.0f)
 
         // intialise the framebuffers
         mFrameBuffer = IntArray(NUMBER_OF_BUFFERS)
@@ -147,8 +135,8 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
         mGameObjectList.add(TriangleGameObject(1))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(1.0f, 0.0f, 0.0f))
-        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 0.0f, 0.0f))
+        mGameObjectList[0].setPosition(Vector3Float(1.0f, 0.0f, 6.0f))
+        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 0.0f, 6.0f))
         mGameObjectList[2].setPosition(Vector3Float(1.0f, 0.0f, -6.0f))
         mGameObjectList[3].setPosition(Vector3Float(-1.0f, 0.0f, -6.0f))
 
@@ -172,19 +160,6 @@ class VrRenderer(controlHub: GameControlHub) : GLSurfaceView.Renderer {
      * draw the textured quads to the screen
      */
     override fun onDrawFrame(unused: GL10?) {
-
-        // update the camera's based on the device rotation
-        // first get the rotation.
-        val rotMat = mControlHub.getLookRotationMatrix()
-
-        // apply the rotation to each camera
-        mLeftCamera.setCameraRotation(rotMat)
-        mRightCamera.setCameraRotation(rotMat)
-
-        // adjust the two cameras using the move translation matrix
-        val offset = mControlHub.getMoveTranslationMatrix()
-        mLeftCamera.adjustPosition(offset.get(12), offset.get(13), offset.get(14))
-        mRightCamera.adjustPosition(offset.get(12), offset.get(13), offset.get(14))
 
         // Draw the left side
         drawSceneToFrameBuffer(mLeftCamera,

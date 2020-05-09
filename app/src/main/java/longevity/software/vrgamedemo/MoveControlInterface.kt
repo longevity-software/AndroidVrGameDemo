@@ -2,5 +2,6 @@ package longevity.software.vrgamedemo
 
 interface MoveControlInterface {
 
-    fun getLatestTranslationMatrix(): FloatArray
+    fun getLatestForwardBackwardsDelta(): Float
+    fun getLatestLeftRightDelta(): Float
 }

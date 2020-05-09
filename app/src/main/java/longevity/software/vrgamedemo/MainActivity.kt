@@ -11,6 +11,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mDeviceRotationSensor: DeviceRotationSensor
     private lateinit var mXboxController: XboxController
     private lateinit var mPlayerControlHub: GameControlHub
+    private lateinit var mVrGlSurfaceView: VrGlSurfaceView
+    private lateinit var mGameLoop: GameLoop
+    private lateinit var mPlayer: Player
+    private lateinit var mPlayerVision: PlayerVision
 
     /**
      * function called when the Main activity is created.
@@ -33,8 +37,21 @@ class MainActivity : AppCompatActivity() {
         // the same xbox controller class implements the look, move and button interfaces.
         mPlayerControlHub = GameControlHub(mXboxController, mXboxController, mXboxController)
 
+        // instantiate the player vision class which is used to render the scene
+        mPlayerVision = PlayerVision()
+
+        // initialise the player instance
+        mPlayer = Player(0.0f, 1.0f, 0.0f, mPlayerVision)
+
+        // create local insance of the VrGlSurfaceView so we can set it
+        // as the content view and we can pass it to the GameLoop
+        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision)
+
         // set the content to our VrGlSurfaceView
-        setContentView(VrGlSurfaceView(this, mPlayerControlHub))
+        setContentView(mVrGlSurfaceView)
+
+        // Initialise the game loop
+        mGameLoop = GameLoop(mVrGlSurfaceView, mPlayerControlHub, mPlayer)
     }
 
     /**
@@ -44,6 +61,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         mDeviceRotationSensor.registerListeners()
+
+        // start the game loop as a thread
+        Thread(mGameLoop).start()
     }
 
     /**
@@ -51,6 +71,9 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onPause() {
         super.onPause()
+
+        // stop the game loop from processing any input and rendering the scene
+        mGameLoop.stopGameLoop()
 
         mDeviceRotationSensor.unregisterListeners()
     }

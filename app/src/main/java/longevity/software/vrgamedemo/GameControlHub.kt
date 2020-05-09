@@ -16,19 +16,35 @@ class GameControlHub(lookControl: LookControlInterface,
     }
 
     /**
-     * function to get the current look rotation
+     * function to get the current look pitch
      * of the currently set look control interface
      */
-    fun getLookRotationMatrix(): FloatArray {
-        return mLookControl.getLatestRotationMatrix()
+    fun getLookPitch(): Float {
+        return mLookControl.getLatestPitch()
     }
 
     /**
-     * function to get the current translation matrix
+     * function to get the current look yaw
+     * of the currently set look control interface
+     */
+    fun getLookYaw(): Float {
+        return mLookControl.getLatestYaw()
+    }
+
+    /**
+     * function to get the current forward/backwards delta
      * of the currently set move control interface
      */
-    fun getMoveTranslationMatrix(): FloatArray {
-        return mMoveControl.getLatestTranslationMatrix()
+    fun getMoveForwardBackDelta(): Float {
+        return mMoveControl.getLatestForwardBackwardsDelta()
+    }
+
+    /**
+     * function to get the current left/right delta
+     * of the currently set move control interface
+     */
+    fun getMoveLeftRightDelta(): Float {
+        return mMoveControl.getLatestLeftRightDelta()
     }
 
     /**

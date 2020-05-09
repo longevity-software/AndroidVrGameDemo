@@ -1,7 +1,5 @@
 package longevity.software.vrgamedemo
 
-import android.opengl.Matrix
-
 class GameCamera (positionX: Float,
                   positionY: Float,
                   positionZ: Float,
@@ -88,44 +86,30 @@ class GameCamera (positionX: Float,
     }
 
     /**
-     * function to adjust the camera's position by the passed delta
+     * function to set the camera position
      */
-    fun adjustPosition(deltaX: Float, deltaY: Float, deltaZ: Float) {
-        mPositionX += deltaX
-        mPositionY += deltaY
-        mPositionZ += deltaZ
+    fun setPosition(vec: Vector3Float) {
+        mPositionX = vec.getX()
+        mPositionY = vec.getY()
+        mPositionZ = vec.getZ()
     }
 
     /**
-     * function to update the direction the camera is
-     * looking based on the passed in rotation matrix.
+     * function to set the direction to look
      */
-    fun setCameraRotation(rotMat: FloatArray) {
-
-        var forward = FloatArray(16)
-        var up = FloatArray(16)
-
-        Matrix.setIdentityM(forward, 0)
-        Matrix.setIdentityM(up, 0)
-
-        // set the forward vector to default
-        Matrix.translateM(forward, 0, 0.0f, 0.0f, 1.0f)
-
-        // and the up vector to default
-        Matrix.translateM(up, 0, 0.0f, 1.0f, 0.0f)
-
-        // rotate the forward and up matrices using the passed rotation matrix
-        Matrix.multiplyMM(up, 0, rotMat, 0, up, 0)
-        Matrix.multiplyMM(forward, 0, rotMat, 0, forward, 0)
-
-        // then update the local look direction
-        mLookDirectionX = forward.get(12)
-        mLookDirectionY = forward.get(13)
-        mLookDirectionZ = forward.get(14)
-
-        // and up direction
-        mUpDirectionX = up.get(12)
-        mUpDirectionY = up.get(13)
-        mUpDirectionZ = up.get(14)
+    fun setLookDirection(vec: Vector3Float) {
+        mLookDirectionX = vec.getX()
+        mLookDirectionY = vec.getY()
+        mLookDirectionZ = vec.getZ()
     }
+
+    /**
+     * function to set the up direction
+     */
+    fun setUpDirection(vec: Vector3Float) {
+        mUpDirectionX = vec.getX()
+        mUpDirectionY = vec.getY()
+        mUpDirectionZ = vec.getZ()
+    }
+
 }

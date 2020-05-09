@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.opengl.Matrix
 import java.util.concurrent.locks.ReentrantLock
 
 class DeviceRotationSensor(context: Context): SensorEventListener, LookControlInterface {
@@ -15,7 +14,8 @@ class DeviceRotationSensor(context: Context): SensorEventListener, LookControlIn
 
     private var mSensorManager: SensorManager
 
-    private var mRotationMatrix = FloatArray(16)
+    private var mPitch: Float
+    private var mYaw: Float
 
     /**
      * init function initialises the sensor manager and sets the rotation matrix to an identity matrix.
@@ -31,8 +31,9 @@ class DeviceRotationSensor(context: Context): SensorEventListener, LookControlIn
         // 3: Significant motion
         var sensorList: List<Sensor>  = mSensorManager.getSensorList(Sensor.TYPE_ALL)
 
-        // set the rotation matrix to the identity matrix
-        Matrix.setIdentityM(mRotationMatrix, 0)
+        // set the rotation angles
+        mPitch = 0.0f
+        mYaw = 0.0f
     }
 
     /**
@@ -76,12 +77,7 @@ class DeviceRotationSensor(context: Context): SensorEventListener, LookControlIn
             // lock so we do not get the rotation matrix while it is being changed
             mRotationLock.lock()
 
-            // convert the rotation-vector to a 4x4 matrix. the matrix
-            // is interpreted by Open GL as the inverse of the
-            // rotation-vector, which is what we want.
-            SensorManager.getRotationMatrixFromVector(
-                mRotationMatrix,
-                event.values)
+            // TODO - generate pitch, roll and yaw angles
 
             // Unlock, now we have altered the rotation matrix
             mRotationLock.unlock()
@@ -90,19 +86,31 @@ class DeviceRotationSensor(context: Context): SensorEventListener, LookControlIn
 
     /**
      * overriden function from the LookControlInterface
-     * returns a copy of the calculated rotation matrix.
+     * returns a copy of the calculated pitch.
      */
-    override fun getLatestRotationMatrix(): FloatArray {
+    override fun getLatestPitch(): Float {
 
-        // lock while we cope the rotation matrix
         mRotationLock.lock()
 
-        // take a copy
-        val rotMat = mRotationMatrix
+        val pitch = mPitch
 
-        // unlock
         mRotationLock.unlock()
 
-        return rotMat
+        return pitch
+    }
+
+    /**
+     * overriden function from the LookControlInterface
+     * returns a copy of the calculated yaw.
+     */
+    override fun getLatestYaw(): Float {
+
+        mRotationLock.lock()
+
+        val yaw = mYaw
+
+        mRotationLock.unlock()
+
+        return yaw
     }
 }
