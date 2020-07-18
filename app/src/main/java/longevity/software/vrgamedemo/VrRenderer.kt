@@ -9,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(vis: PlayerVision) : GLSurfaceView.Renderer {
+class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mViewMatrix = FloatArray(16)
@@ -42,9 +42,16 @@ class VrRenderer(vis: PlayerVision) : GLSurfaceView.Renderer {
     // Lists of the Game Objects in the scene
     private val mGameObjectList = mutableListOf<AbstractGameObject>()
 
-    // screen width and height variables
+    // the skybox background
+    private val mSkyBox = sky
+
+    // View variables
     private var mScreenWidth: Int = 0
     private var mScreenHeight: Int = 0
+
+    // Vies constants
+    private val NEAR_DISTANCE = 1.0f
+    private val FAR_DISTANCE = 10.0f
 
     /**
      * Function called when the surface is created.
@@ -142,7 +149,11 @@ class VrRenderer(vis: PlayerVision) : GLSurfaceView.Renderer {
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1.0f, 1.0f, 1.0f, 10.0f)
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1.0f, 1.0f, NEAR_DISTANCE, FAR_DISTANCE)
+
+        // initialise the skybox
+        mSkyBox.initialiseSkyBox(FAR_DISTANCE)
+
     }
 
     /**
@@ -153,6 +164,8 @@ class VrRenderer(vis: PlayerVision) : GLSurfaceView.Renderer {
         mScreenWidth = width
         mScreenHeight = height
     }
+
+
 
     /**
      * Function called when the frame is drawn.
@@ -245,5 +258,8 @@ class VrRenderer(vis: PlayerVision) : GLSurfaceView.Renderer {
         for (gameObject in mGameObjectList) {
             gameObject.draw(viewProjectionMatrix)
         }
+
+        // render the skybox
+        mSkyBox.draw(viewProjectionMatrix)
     }
 }

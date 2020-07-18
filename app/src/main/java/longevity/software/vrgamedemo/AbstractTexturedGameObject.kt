@@ -119,6 +119,7 @@ abstract class AbstractTexturedGameObject {
             GLES20.glCompileShader(shader)
         }
     }
+
     /**
      * Function which draws the model using the model view projection matrix passed
      * and textures it with the passed texture reference if the parameters have been set.

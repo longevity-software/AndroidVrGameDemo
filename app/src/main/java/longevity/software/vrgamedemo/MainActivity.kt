@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mGameLoop: GameLoop
     private lateinit var mPlayer: Player
     private lateinit var mPlayerVision: PlayerVision
+    private lateinit var mSkyBox: SkyBox
 
     /**
      * function called when the Main activity is created.
@@ -40,12 +41,15 @@ class MainActivity : AppCompatActivity() {
         // instantiate the player vision class which is used to render the scene
         mPlayerVision = PlayerVision()
 
+        // instantiate the sky box and set default bitmaps
+        mSkyBox = SkyBox()
+
         // initialise the player instance
         mPlayer = Player(0.0f, 1.0f, 0.0f, mPlayerVision)
 
         // create local insance of the VrGlSurfaceView so we can set it
         // as the content view and we can pass it to the GameLoop
-        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision)
+        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision, mSkyBox)
 
         // set the content to our VrGlSurfaceView
         setContentView(mVrGlSurfaceView)
