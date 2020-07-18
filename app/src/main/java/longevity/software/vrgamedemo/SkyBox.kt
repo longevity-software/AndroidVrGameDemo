@@ -1,6 +1,7 @@
 package longevity.software.vrgamedemo
 
 import android.opengl.GLES20
+import android.opengl.Matrix
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -41,15 +42,18 @@ class SkyBox() {
     // private variables
     private var mProgram: Int = 0
     private var mIndexCount: Int = 0
+    private lateinit var mScaleMatrix: FloatArray
 
     private val vertexCoordsArray: FloatArray = floatArrayOf(    // in counterclockwise order:
-        1.0f, 1.0f, 2.0f,       // top left
-        1.0f, 0.0f, 2.0f,       // bottom left
-        -1.0f, 0.0f, 2.0f      // bottom right
+        1.0f, 1.0f, 1.0f,       // top front left
+        1.0f, 0.0f, 1.0f,       // bottom front left
+        -1.0f, 0.0f, 1.0f,      // bottom front right
+        -1.0f, 1.0f, 1.0f       // top front right
     )
 
     private val indicesArray: ShortArray = shortArrayOf(
-        0, 1, 2
+        0, 1, 2,
+        0, 2, 3
     )
 
     private val colourRGBA = floatArrayOf(0.22265625f, 0.63671875f, 0.76953125f, 1.0f)
@@ -81,6 +85,11 @@ class SkyBox() {
         // set the local copy of the number of indices and the flag
         // indicating that the parameters have been set
         mIndexCount = indicesArray.size
+
+        // set the initial scale to 1
+        mScaleMatrix = FloatArray(16).also {
+            Matrix.setIdentityM(it, 0)
+        }
     }
 
     /**
@@ -105,6 +114,11 @@ class SkyBox() {
             GLES20.glLinkProgram(it)
         }
 
+        Matrix.setIdentityM(mScaleMatrix, 0)
+
+        val SCALE = (dist * 0.99f)
+
+        Matrix.scaleM(mScaleMatrix, 0,  SCALE, SCALE, SCALE)
     }
 
     fun draw(vpMatrix: FloatArray) {
@@ -124,6 +138,9 @@ class SkyBox() {
             GLES20.glGetUniformLocation(mProgram, "vColor").also { colourHandle ->
                 GLES20.glUniform4fv(colourHandle, 1, colourRGBA, 0)
             }
+
+            // scale the skybox.
+            Matrix.multiplyMM(vpMatrix, 0, vpMatrix, 0, mScaleMatrix, 0)
 
             GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
                 GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)

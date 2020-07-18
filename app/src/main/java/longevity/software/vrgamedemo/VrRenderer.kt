@@ -135,6 +135,9 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
         // set the background frame colour to black
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
 
+        // enable depth testing
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+
         // initialise the game objects which will be drawn
         mGameObjectList.add(TriangleGameObject(0))
         mGameObjectList.add(TriangleGameObject(0))
@@ -196,6 +199,7 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT)
 
         // draw the quad with the generated textures.
         mLeftQuad.draw(identityMatrix, mRenderTexture[LEFT_FRAMEBUFFER_INDEX])
@@ -244,6 +248,7 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
         val viewProjectionMatrix = FloatArray(16)
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT)
 
         // set the camera based on the passed GameCamera
         Matrix.setLookAtM(mViewMatrix, 0,
