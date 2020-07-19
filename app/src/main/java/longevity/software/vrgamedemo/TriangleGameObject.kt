@@ -13,14 +13,14 @@ class TriangleGameObject(colour: Int) : AbstractGameObject() {
     )
 
     private val greenRGBA = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
-    private val purpleRGBA = floatArrayOf(0.63671875f, 0.22265625f, 0.76953125f, 1.0f)
+    private val blueRGBA = floatArrayOf(0.22265625f, 0.63671875f, 0.76953125f, 1.0f)
 
     /**
      * TriangleGameObject init block which sets the parameters in the abstract base class
      */
     init {
         if (colour == 0) {
-            super.SetParameters(vertexCoordsArray, indicesArray, purpleRGBA)
+            super.SetParameters(vertexCoordsArray, indicesArray, blueRGBA)
         } else {
             super.SetParameters(vertexCoordsArray, indicesArray, greenRGBA)
         }

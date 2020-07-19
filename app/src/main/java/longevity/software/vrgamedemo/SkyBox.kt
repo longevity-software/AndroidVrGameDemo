@@ -10,16 +10,20 @@ class SkyBox() {
 
     // constants.
     private val COORDS_PER_VERTEX = 3
+    private val COLOURS_PER_VERTEX = 4
     private val BYTES_PER_FLOAT = 4
     private val BYTES_PER_SHORT = 2
 
     private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
+    private val colourStride: Int = COLOURS_PER_VERTEX * BYTES_PER_FLOAT
 
     private val vertexShaderCode =
     // This matrix member variable provides a hook to manipulate
         // the coordinates of the objects that use this vertex shader
         "uniform mat4 uMVPMatrix;" +
                 "attribute vec3 vPosition;" +
+                "attribute vec4 vColour;" +
+                "varying vec4 vCol;" +
                 "void main() {" +
                 // the matrix must be included as a modifier of gl_Position
                 // Note that the uMVPMatrix factor *must be first* in order
@@ -27,18 +31,20 @@ class SkyBox() {
                 " vec4 pos = uMVPMatrix * vec4(vPosition.xyz, 1.0);" +      // calculate the position
                 // set the z component to the w value so the skybox is always at the furthest possible distance
                 "  gl_Position = vec4(pos.x, pos.y, pos.w, pos.w);" +
+                " vCol = vColour;" +
                 "}"
 
     private val fragmentShaderCode =
         "precision mediump float;" +
-                "uniform vec4 vColor;" +
+                "varying vec4 vCol;" +
                 "void main() {" +
-                "  gl_FragColor = vColor;" +
+                "  gl_FragColor = vCol;" +
                 "}"
 
     // Parameters which are set in the setParameter function.
-    private var vertexBuffer: FloatBuffer
-    private var indicesBuffer: ShortBuffer
+    private var mVertexBuffer: FloatBuffer
+    private var mColourBuffer: FloatBuffer
+    private var mIndicesBuffer: ShortBuffer
 
     // private variables
     private var mProgram: Int = 0
@@ -59,10 +65,27 @@ class SkyBox() {
         0, 1, 2,    //
         0, 2, 3,    // front
         0, 5, 1,    //
-        0, 4, 5     // left
+        0, 4, 5,    // left
+        4, 6, 5,    //
+        4, 7, 6,    // rear
+        7, 2, 6,    //
+        7, 3, 2,    // right
+        0, 7, 3,    //
+        0, 4, 7,    // top
+        1, 6, 5,    //
+        1, 2, 6     // bottom
     )
 
-    private val colourRGBA = floatArrayOf(0.22265625f, 0.63671875f, 0.76953125f, 1.0f)
+    private val colourRGBA: FloatArray =  floatArrayOf(
+        0.76953125f, 0.22265625f, 0.63671875f, 1.0f,
+        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
+        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
+        0.76953125f, 0.22265625f, 0.63671875f, 1.0f,
+        0.76953125f, 0.22265625f, 0.63671875f, 1.0f,
+        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
+        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
+        0.76953125f, 0.22265625f, 0.63671875f, 1.0f
+        )
 
     /**
      * AbstractGameObject init block which creates the program and loads shaders.
@@ -70,7 +93,7 @@ class SkyBox() {
     init {
 
         // set the buffers with the arrays passed in.
-        vertexBuffer =
+        mVertexBuffer =
             ByteBuffer.allocateDirect(vertexCoordsArray.size * BYTES_PER_FLOAT).run {
                 order(ByteOrder.nativeOrder())
                 asFloatBuffer().apply {
@@ -79,7 +102,16 @@ class SkyBox() {
                 }
             }
 
-        indicesBuffer =
+        mColourBuffer =
+            ByteBuffer.allocateDirect(colourRGBA.size * BYTES_PER_FLOAT).run {
+                order(ByteOrder.nativeOrder())
+                asFloatBuffer().apply {
+                    put(colourRGBA)
+                    position(0)
+                }
+            }
+
+        mIndicesBuffer =
             ByteBuffer.allocateDirect(indicesArray.size * BYTES_PER_SHORT).run {
                 order(ByteOrder.nativeOrder())
                 asShortBuffer().apply {
@@ -134,23 +166,33 @@ class SkyBox() {
                 GLES20.GL_FLOAT,
                 false,
                 vertexStride,
-                vertexBuffer
+                mVertexBuffer
             )
 
-            GLES20.glGetUniformLocation(mProgram, "vColor").also { colourHandle ->
-                GLES20.glUniform4fv(colourHandle, 1, colourRGBA, 0)
-            }
+            GLES20.glGetAttribLocation(mProgram, "vColour").also {
+                GLES20.glEnableVertexAttribArray(it)
+                GLES20.glVertexAttribPointer(
+                    it,
+                    COLOURS_PER_VERTEX,
+                    GLES20.GL_FLOAT,
+                    false,
+                    colourStride,
+                    mColourBuffer
+                )
 
-            GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
-                GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
-            }
+                GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
+                    GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
+                }
 
-            GLES20.glDrawElements(
-                GLES20.GL_TRIANGLES,
-                mIndexCount,
-                GLES20.GL_UNSIGNED_SHORT,
-                indicesBuffer
-            )
+                GLES20.glDrawElements(
+                    GLES20.GL_TRIANGLES,
+                    mIndexCount,
+                    GLES20.GL_UNSIGNED_SHORT,
+                    mIndicesBuffer
+                )
+
+                GLES20.glDisableVertexAttribArray(it)
+            }
 
             GLES20.glDisableVertexAttribArray(it)
         }
