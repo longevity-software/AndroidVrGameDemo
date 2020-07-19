@@ -65,6 +65,27 @@ class GameCamera (positionX: Float,
     }
 
     /**
+     * function to return the x portion of the look direction.
+     */
+    fun getLookDirectionX() : Float {
+        return mLookDirectionX
+    }
+
+    /**
+     * function to return the y portion of the look direction.
+     */
+    fun getLookDirectionY() : Float {
+        return mLookDirectionY
+    }
+
+    /**
+     * function to return the z portion of the look direction.
+     */
+    fun getLookDirectionZ() : Float {
+        return mLookDirectionZ
+    }
+
+    /**
      * function to return the x portion of the up direction.
      */
     fun getUpDirectionX() : Float {

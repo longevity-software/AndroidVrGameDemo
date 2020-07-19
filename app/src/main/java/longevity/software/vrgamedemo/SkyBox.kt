@@ -1,7 +1,6 @@
 package longevity.software.vrgamedemo
 
 import android.opengl.GLES20
-import android.opengl.Matrix
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -20,12 +19,14 @@ class SkyBox() {
     // This matrix member variable provides a hook to manipulate
         // the coordinates of the objects that use this vertex shader
         "uniform mat4 uMVPMatrix;" +
-                "attribute vec4 vPosition;" +
+                "attribute vec3 vPosition;" +
                 "void main() {" +
                 // the matrix must be included as a modifier of gl_Position
                 // Note that the uMVPMatrix factor *must be first* in order
                 // for the matrix multiplication product to be correct.
-                "  gl_Position = uMVPMatrix * vPosition;" +
+                " vec4 pos = uMVPMatrix * vec4(vPosition.xyz, 1.0);" +      // calculate the position
+                // set the z component to the w value so the skybox is always at the furthest possible distance
+                "  gl_Position = vec4(pos.x, pos.y, pos.w, pos.w);" +
                 "}"
 
     private val fragmentShaderCode =
@@ -42,18 +43,23 @@ class SkyBox() {
     // private variables
     private var mProgram: Int = 0
     private var mIndexCount: Int = 0
-    private lateinit var mScaleMatrix: FloatArray
 
     private val vertexCoordsArray: FloatArray = floatArrayOf(    // in counterclockwise order:
-        1.0f, 1.0f, 1.0f,       // top front left
-        1.0f, 0.0f, 1.0f,       // bottom front left
-        -1.0f, 0.0f, 1.0f,      // bottom front right
-        -1.0f, 1.0f, 1.0f       // top front right
+        1.0f, 1.0f, 1.0f,       // top front left       0
+        1.0f, -1.0f, 1.0f,       // bottom front left    1
+        -1.0f, -1.0f, 1.0f,      // bottom front right   2
+        -1.0f, 1.0f, 1.0f,      // top front right      3
+        1.0f, 1.0f, -1.0f,       // top rear left       4
+        1.0f, -1.0f, -1.0f,       // bottom rear left    5
+        -1.0f, -1.0f, -1.0f,      // bottom rear right   6
+        -1.0f, 1.0f, -1.0f       // top rear right      7
     )
 
     private val indicesArray: ShortArray = shortArrayOf(
-        0, 1, 2,
-        0, 2, 3
+        0, 1, 2,    //
+        0, 2, 3,    // front
+        0, 5, 1,    //
+        0, 4, 5     // left
     )
 
     private val colourRGBA = floatArrayOf(0.22265625f, 0.63671875f, 0.76953125f, 1.0f)
@@ -85,11 +91,6 @@ class SkyBox() {
         // set the local copy of the number of indices and the flag
         // indicating that the parameters have been set
         mIndexCount = indicesArray.size
-
-        // set the initial scale to 1
-        mScaleMatrix = FloatArray(16).also {
-            Matrix.setIdentityM(it, 0)
-        }
     }
 
     /**
@@ -103,7 +104,11 @@ class SkyBox() {
         }
     }
 
-    fun initialiseSkyBox(dist: Float) {
+    /**
+     * Function to initialise the rendering program
+     * Note: Must be called in the renderers onSurfaceCreated method.
+     */
+    fun initialiseSkyBox() {
 
         val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
@@ -113,14 +118,11 @@ class SkyBox() {
             GLES20.glAttachShader(it, fragmentShader)
             GLES20.glLinkProgram(it)
         }
-
-        Matrix.setIdentityM(mScaleMatrix, 0)
-
-        val SCALE = (dist * 0.99f)
-
-        Matrix.scaleM(mScaleMatrix, 0,  SCALE, SCALE, SCALE)
     }
 
+    /**
+     * draw function
+     */
     fun draw(vpMatrix: FloatArray) {
         GLES20.glUseProgram(mProgram)
 
@@ -139,9 +141,6 @@ class SkyBox() {
                 GLES20.glUniform4fv(colourHandle, 1, colourRGBA, 0)
             }
 
-            // scale the skybox.
-            Matrix.multiplyMM(vpMatrix, 0, vpMatrix, 0, mScaleMatrix, 0)
-
             GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
                 GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
             }
@@ -152,6 +151,7 @@ class SkyBox() {
                 GLES20.GL_UNSIGNED_SHORT,
                 indicesBuffer
             )
+
             GLES20.glDisableVertexAttribArray(it)
         }
     }

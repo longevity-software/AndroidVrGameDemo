@@ -12,7 +12,6 @@ import javax.microedition.khronos.opengles.GL10
 class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
-    private val mViewMatrix = FloatArray(16)
     private val mProjectionMatrix = FloatArray(16)
 
     // Quads which fill the left and right side of the screen
@@ -137,6 +136,7 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
 
         // enable depth testing
         GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+        GLES20.glDepthFunc(GLES20.GL_LEQUAL)
 
         // initialise the game objects which will be drawn
         mGameObjectList.add(TriangleGameObject(0))
@@ -155,8 +155,7 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1.0f, 1.0f, NEAR_DISTANCE, FAR_DISTANCE)
 
         // initialise the skybox
-        mSkyBox.initialiseSkyBox(FAR_DISTANCE)
-
+        mSkyBox.initialiseSkyBox()
     }
 
     /**
@@ -245,26 +244,38 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
      */
     private fun drawScene(camera: GameCamera) {
 
+        val viewMatrix = FloatArray(16)
+        val skyboxViewMatrix = FloatArray(16)
         val viewProjectionMatrix = FloatArray(16)
+        val skyboxViewProjectionMatrix = FloatArray(16)
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT)
 
         // set the camera based on the passed GameCamera
-        Matrix.setLookAtM(mViewMatrix, 0,
+        Matrix.setLookAtM(viewMatrix, 0,
             camera.getPositionX(), camera.getPositionY(), camera.getPositionZ(),
             camera.getLookPositionX(), camera.getLookPositionY(), camera.getLookPositionZ(),
             camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ())
 
         // create a view projection matrix
-        Matrix.multiplyMM(viewProjectionMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0)
+        Matrix.multiplyMM(viewProjectionMatrix, 0, mProjectionMatrix, 0, viewMatrix, 0)
 
         // draw all the game objects in the list.
         for (gameObject in mGameObjectList) {
             gameObject.draw(viewProjectionMatrix)
         }
 
+        // set the camera based on the passed GameCamera but without the translation element
+        Matrix.setLookAtM(skyboxViewMatrix, 0,
+            0.0f, 0.0f, 0.0f,
+            camera.getLookDirectionX(), camera.getLookDirectionY(), camera.getLookDirectionZ(),
+            camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ())
+
+        // create a view projection matrix without the translation
+        Matrix.multiplyMM(skyboxViewProjectionMatrix, 0, mProjectionMatrix, 0, skyboxViewMatrix, 0)
+
         // render the skybox
-        mSkyBox.draw(viewProjectionMatrix)
+        mSkyBox.draw(skyboxViewProjectionMatrix)
     }
 }
