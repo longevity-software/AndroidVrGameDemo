@@ -1,17 +1,17 @@
 package longevity.software.vrgamedemo
 
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.opengl.GLES20
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.FloatBuffer
-import java.nio.ShortBuffer
+import java.nio.*
 
-class SkyBox() {
+class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitmap, bottom: Bitmap) {
 
     // constants.
     private val COORDS_PER_VERTEX = 3
     private val COLOURS_PER_VERTEX = 4
     private val BYTES_PER_FLOAT = 4
+    private val BYTES_PER_PIXEL = 3
     private val BYTES_PER_SHORT = 2
 
     private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
@@ -41,10 +41,12 @@ class SkyBox() {
                 "  gl_FragColor = vCol;" +
                 "}"
 
-    // Parameters which are set in the setParameter function.
+    // buffers used to render the skybox.
     private var mVertexBuffer: FloatBuffer
     private var mColourBuffer: FloatBuffer
     private var mIndicesBuffer: ShortBuffer
+    private var mTextureBuffer: IntBuffer
+    private var mTextureData: Array<TextureData>
 
     // private variables
     private var mProgram: Int = 0
@@ -123,6 +125,19 @@ class SkyBox() {
         // set the local copy of the number of indices and the flag
         // indicating that the parameters have been set
         mIndexCount = indicesArray.size
+
+        // allocate the texture buffer
+        mTextureBuffer = IntBuffer.allocate(1)
+
+        // get the texture data
+        mTextureData = arrayOf(
+            TextureData(front.width, front.height, getPixelData(front)),
+            TextureData(back.width, back.height, getPixelData(back)),
+            TextureData(left.width, left.height, getPixelData(left)),
+            TextureData(right.width, right.height, getPixelData(right)),
+            TextureData(top.width, top.height, getPixelData(top)),
+            TextureData(bottom.width, bottom.height, getPixelData(bottom))
+        )
     }
 
     /**
@@ -150,6 +165,63 @@ class SkyBox() {
             GLES20.glAttachShader(it, fragmentShader)
             GLES20.glLinkProgram(it)
         }
+
+        // set up the texturing
+        GLES20.glGenTextures(1, mTextureBuffer)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_CUBE_MAP, mTextureBuffer[0])
+
+        // integer texture targets
+        val textureTargets: IntArray = intArrayOf(
+            GLES20.GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+            GLES20.GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+            GLES20.GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+            GLES20.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            GLES20.GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+            GLES20.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+        )
+
+        // loop for all images, use integer from 0 to 5 as multiple arrays are being indexed.
+        for ( i in 0 .. ( textureTargets.size - 1 ) ) {
+
+            GLES20.glTexImage2D(
+                textureTargets[i],
+                0,
+                GLES20.GL_RGB,
+                mTextureData[i].width(),
+                mTextureData[i].height(),
+                0,
+                GLES20.GL_RGB,
+                GLES20.GL_UNSIGNED_BYTE,
+                mTextureData[i].data()
+            )
+        }
+    }
+
+    /**
+     * function to get pixel data from a bitmap
+     */
+    private fun getPixelData(bmp: Bitmap): ByteBuffer {
+        val bb = ByteBuffer.allocateDirect(bmp.height * bmp.width * BYTES_PER_PIXEL).also {
+
+            // loop through all pixels
+            for ( x in 0 .. ( bmp.width - 1 ) ) {
+                for ( y in 0 .. ( bmp.height - 1 ) ) {
+
+                    // get this pixel
+                    val pixel = bmp.getPixel(x, y)
+
+                    // and put its RGB values in the ByteBuffer
+                    it.put(Color.red(pixel).toByte())   // Red
+                    it.put(Color.green(pixel).toByte()) // Green
+                    it.put(Color.blue(pixel).toByte())  // Blue
+                }
+            }
+
+            // reset the position back to 0
+            it.position(0)
+        }
+
+        return bb
     }
 
     /**

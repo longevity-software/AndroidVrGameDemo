@@ -1,5 +1,6 @@
 package longevity.software.vrgamedemo
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -42,7 +43,13 @@ class MainActivity : AppCompatActivity() {
         mPlayerVision = PlayerVision()
 
         // instantiate the sky box and set default bitmaps
-        mSkyBox = SkyBox()
+        mSkyBox = SkyBox(
+                    BitmapFactory.decodeResource(getResources(), R.drawable.front),
+                    BitmapFactory.decodeResource(getResources(), R.drawable.back),
+                    BitmapFactory.decodeResource(getResources(), R.drawable.left),
+                    BitmapFactory.decodeResource(getResources(), R.drawable.right),
+                    BitmapFactory.decodeResource(getResources(), R.drawable.top),
+                    BitmapFactory.decodeResource(getResources(), R.drawable.bottom))
 
         // initialise the player instance
         mPlayer = Player(0.0f, 1.0f, 0.0f, mPlayerVision)
