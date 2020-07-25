@@ -22,8 +22,7 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
         // the coordinates of the objects that use this vertex shader
         "uniform mat4 uMVPMatrix;" +
                 "attribute vec3 vPosition;" +
-                "attribute vec4 vColour;" +
-                "varying vec4 vCol;" +
+                "varying vec3 vTextureCoords;" +
                 "void main() {" +
                 // the matrix must be included as a modifier of gl_Position
                 // Note that the uMVPMatrix factor *must be first* in order
@@ -31,14 +30,15 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
                 " vec4 pos = uMVPMatrix * vec4(vPosition.xyz, 1.0);" +      // calculate the position
                 // set the z component to the w value so the skybox is always at the furthest possible distance
                 "  gl_Position = vec4(pos.x, pos.y, pos.w, pos.w);" +
-                " vCol = vColour;" +
+                " vTextureCoords = vPosition.xyz;" +
                 "}"
 
     private val fragmentShaderCode =
         "precision mediump float;" +
-                "varying vec4 vCol;" +
+                "varying vec3 vTextureCoords;" +
+                "uniform samplerCube skybox;" +
                 "void main() {" +
-                "  gl_FragColor = vCol;" +
+                "  gl_FragColor = textureCube(skybox, vTextureCoords);" +
                 "}"
 
     // buffers used to render the skybox.
@@ -131,12 +131,12 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
 
         // get the texture data
         mTextureData = arrayOf(
-            TextureData(front.width, front.height, getPixelData(front)),
-            TextureData(back.width, back.height, getPixelData(back)),
-            TextureData(left.width, left.height, getPixelData(left)),
             TextureData(right.width, right.height, getPixelData(right)),
+            TextureData(left.width, left.height, getPixelData(left)),
             TextureData(top.width, top.height, getPixelData(top)),
-            TextureData(bottom.width, bottom.height, getPixelData(bottom))
+            TextureData(bottom.width, bottom.height, getPixelData(bottom)),
+            TextureData(back.width, back.height, getPixelData(back)),
+            TextureData(front.width, front.height, getPixelData(front))
         )
     }
 
@@ -195,6 +195,11 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
                 mTextureData[i].data()
             )
         }
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
     }
 
     /**
@@ -204,9 +209,8 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
         val bb = ByteBuffer.allocateDirect(bmp.height * bmp.width * BYTES_PER_PIXEL).also {
 
             // loop through all pixels
-            for ( x in 0 .. ( bmp.width - 1 ) ) {
-                for ( y in 0 .. ( bmp.height - 1 ) ) {
-
+            for ( y in 0 .. ( bmp.height - 1 ) ) {
+                for ( x in 0 .. ( bmp.width - 1 ) ) {
                     // get this pixel
                     val pixel = bmp.getPixel(x, y)
 
@@ -241,30 +245,18 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
                 mVertexBuffer
             )
 
-            GLES20.glGetAttribLocation(mProgram, "vColour").also {
-                GLES20.glEnableVertexAttribArray(it)
-                GLES20.glVertexAttribPointer(
-                    it,
-                    COLOURS_PER_VERTEX,
-                    GLES20.GL_FLOAT,
-                    false,
-                    colourStride,
-                    mColourBuffer
-                )
-
-                GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
-                    GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
-                }
-
-                GLES20.glDrawElements(
-                    GLES20.GL_TRIANGLES,
-                    mIndexCount,
-                    GLES20.GL_UNSIGNED_SHORT,
-                    mIndicesBuffer
-                )
-
-                GLES20.glDisableVertexAttribArray(it)
+            GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
+                GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
             }
+
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_CUBE_MAP, mTextureBuffer[0])
+
+            GLES20.glDrawElements(
+                GLES20.GL_TRIANGLES,
+                mIndexCount,
+                GLES20.GL_UNSIGNED_SHORT,
+                mIndicesBuffer
+            )
 
             GLES20.glDisableVertexAttribArray(it)
         }
