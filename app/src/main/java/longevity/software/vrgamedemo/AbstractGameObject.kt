@@ -47,6 +47,7 @@ abstract class AbstractGameObject() {
 
     // variables used to generate the model matrix
     private var mPosition: Vector3Float
+    private var mScale: Vector3Float
 
     /**
      * AbstractGameObject init block which creates the program and loads shaders.
@@ -57,6 +58,7 @@ abstract class AbstractGameObject() {
 
         // set the initial position.
         mPosition = Vector3Float(0.0f, 0.0f, 0.0f)
+        mScale = Vector3Float(1.0f, 1.0f, 1.0f)
 
         val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
@@ -142,9 +144,18 @@ abstract class AbstractGameObject() {
                 Matrix.setIdentityM(translationMatrix, 0)   // ensure we are starting from identity
                 Matrix.translateM(translationMatrix, 0, mPosition.getX(), mPosition.getY(), mPosition.getZ())
 
+                val scaleMatrix = FloatArray(16).also {
+                    Matrix.setIdentityM(it, 0)
+                    Matrix.scaleM(it, 0, mScale.getX(), mScale.getY(), mScale.getZ())
+                }
+
+                val modelMatrix = FloatArray(16).also {
+                    Matrix.multiplyMM(it, 0, translationMatrix, 0, scaleMatrix, 0)
+                }
+
                 // add the model matrix to the view projection matrix to create the model view projection matrix.
                 val mvpMatrix = FloatArray(16)
-                Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, translationMatrix, 0)
+                Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, modelMatrix, 0)
 
                 GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
                     GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mvpMatrix, 0)
@@ -166,5 +177,9 @@ abstract class AbstractGameObject() {
      */
     fun setPosition(pos: Vector3Float) {
         mPosition = pos
+    }
+
+    fun setScale(scale: Vector3Float) {
+        mScale = scale
     }
 }

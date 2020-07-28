@@ -1,5 +1,6 @@
 package longevity.software.vrgamedemo
 
+import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
@@ -9,7 +10,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
+class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mProjectionMatrix = FloatArray(16)
@@ -21,6 +22,9 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
     // Camera definitions.
     private var mRightCamera = vis.getRightEyeCamera()
     private var mLeftCamera = vis.getLeftEyeCamera()
+
+    // local copy of the context
+    private val mContext = context
 
     // framebuffer constants
     private val TEXTURE_WIDTH: Int = 768
@@ -138,17 +142,15 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         GLES20.glDepthFunc(GLES20.GL_LEQUAL)
 
+        val obj = ObjectFileParser(mContext, "cube.obj")
+
         // initialise the game objects which will be drawn
-        mGameObjectList.add(TriangleGameObject(0))
-        mGameObjectList.add(TriangleGameObject(0))
-        mGameObjectList.add(TriangleGameObject(1))
-        mGameObjectList.add(TriangleGameObject(1))
+        mGameObjectList.add(GenericGameObject(0, obj.getVertices(), obj.getIndices()))
+        mGameObjectList.add(GenericGameObject(1, obj.getVertices(), obj.getIndices()))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(1.0f, 0.0f, 6.0f))
-        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 0.0f, 6.0f))
-        mGameObjectList[2].setPosition(Vector3Float(1.0f, 0.0f, -6.0f))
-        mGameObjectList[3].setPosition(Vector3Float(-1.0f, 0.0f, -6.0f))
+        mGameObjectList[0].setPosition(Vector3Float(0.0f, 0.0f, 6.0f))
+        mGameObjectList[1].setPosition(Vector3Float(0.0f, 0.0f, -6.0f))
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()

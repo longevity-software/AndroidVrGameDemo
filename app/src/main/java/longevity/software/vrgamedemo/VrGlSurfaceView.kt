@@ -16,7 +16,7 @@ class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurf
         setEGLContextClientVersion(2)
 
         // instantiate the renderer and set it to be used
-        mRenderer = VrRenderer(vis, sky)
+        mRenderer = VrRenderer(context, vis, sky)
         setRenderer(mRenderer)
 
         // set it to only render when we want it to.
