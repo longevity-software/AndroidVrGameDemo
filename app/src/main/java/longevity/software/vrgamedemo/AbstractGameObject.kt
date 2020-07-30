@@ -36,9 +36,10 @@ abstract class AbstractGameObject() {
                 "}"
 
     // Parameters which are set in the setParameter function.
-    private lateinit var colourRGBA: FloatArray
-    private lateinit var vertexBuffer: FloatBuffer
-    private lateinit var indicesBuffer: ShortBuffer
+    private lateinit var mColourRGBA: FloatArray
+    private lateinit var mVerticesBuffer: FloatBuffer
+    private lateinit var mNormalsBuffer: FloatBuffer
+    private lateinit var mIndicesBuffer: ShortBuffer
 
     // private variables
     private var mProgram: Int
@@ -74,10 +75,10 @@ abstract class AbstractGameObject() {
      * Function to set the parameters which are specific to each class which
      * inherits from this abstract class
      */
-    fun SetParameters(vertices: FloatArray, indices: ShortArray, colours: FloatArray) {
+    fun SetParameters(vertices: FloatArray, indices: ShortArray, normals: FloatArray, colours: FloatArray) {
 
         // set the buffers with the arrays passed in.
-        vertexBuffer =
+        mVerticesBuffer =
             ByteBuffer.allocateDirect(vertices.size * BYTES_PER_FLOAT).run {
                 order(ByteOrder.nativeOrder())
                 asFloatBuffer().apply {
@@ -86,7 +87,16 @@ abstract class AbstractGameObject() {
                 }
             }
 
-        indicesBuffer =
+        mNormalsBuffer =
+            ByteBuffer.allocateDirect(normals.size * BYTES_PER_FLOAT).run {
+                order(ByteOrder.nativeOrder())
+                asFloatBuffer().apply {
+                    put(normals)
+                    position(0)
+                }
+            }
+
+        mIndicesBuffer =
             ByteBuffer.allocateDirect(indices.size * BYTES_PER_SHORT).run {
                 order(ByteOrder.nativeOrder())
                 asShortBuffer().apply {
@@ -95,7 +105,7 @@ abstract class AbstractGameObject() {
                 }
             }
 
-        colourRGBA = colours
+        mColourRGBA = colours
 
         // set the local copy of the number of indices and the flag
         // indicating that the parameters have been set
@@ -132,11 +142,11 @@ abstract class AbstractGameObject() {
                     GLES20.GL_FLOAT,
                     false,
                     vertexStride,
-                    vertexBuffer
+                    mVerticesBuffer
                 )
 
                 GLES20.glGetUniformLocation(mProgram, "vColor").also { colourHandle ->
-                    GLES20.glUniform4fv(colourHandle, 1, colourRGBA, 0)
+                    GLES20.glUniform4fv(colourHandle, 1, mColourRGBA, 0)
                 }
 
                 // generate the model matrix Note Currently this is only a translation
@@ -165,7 +175,7 @@ abstract class AbstractGameObject() {
                     GLES20.GL_TRIANGLES,
                     mIndexCount,
                     GLES20.GL_UNSIGNED_SHORT,
-                    indicesBuffer
+                    mIndicesBuffer
                 )
                 GLES20.glDisableVertexAttribArray(it)
             }

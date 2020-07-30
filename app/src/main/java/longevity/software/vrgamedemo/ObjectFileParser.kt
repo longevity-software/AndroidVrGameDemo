@@ -6,11 +6,14 @@ import java.io.InputStreamReader
 
 class ObjectFileParser(context: Context, file: String) {
 
-    private val mVertices = mutableListOf<Float>()
-    private val mNormals = mutableListOf<Float>()
-    private val mUVs = mutableListOf<Float>()
-    private val mIndices = mutableListOf<Short>()
+    private val mFinalVertices = mutableListOf<Float>()
+    private val mFinalNormals = mutableListOf<Float>()
+    private val mFinalUVs = mutableListOf<Float>()
+    private val mFinalIndices = mutableListOf<Short>()
 
+    /**
+     * Init - parses the file in assets that matches the file string passed.
+     */
     init {
         val inStream = context.assets.open(file)
         val reader = BufferedReader(InputStreamReader(inStream))
@@ -19,7 +22,7 @@ class ObjectFileParser(context: Context, file: String) {
         val normals = ArrayList<Triple<Float, Float, Float>>()
         val uvs = ArrayList<Pair<Float, Float>>()
 
-        val faceMap = HashMap<Triple<Int, Int?, Int>, Short>()
+        val faceMap = HashMap<Triple<Int, Int?, Int?>, Short>()
         var nextIndex: Short = 0
 
         reader.forEachLine {
@@ -50,115 +53,146 @@ class ObjectFileParser(context: Context, file: String) {
             }
             else if ( it.startsWith("f " ) ) {
 
+                // perform the first split
                 val split = it.split( " " )
 
-                val split1 = split[1].split("/")
-                val split2 = split[3].split("/")
-                val split3 = split[2].split("/")
+                // get the first vertex, uv and normal
+                val vun1 = split[1].split("/")
+                val point1 = Triple(vun1[0].toInt(), vun1[1].toIntOrNull(), vun1[2].toIntOrNull())
 
-                val trip1 = Triple(split1[0].toInt(), split1[1].toIntOrNull(), split1[2].toInt())
-                val trip2 = Triple(split2[0].toInt(), split2[1].toIntOrNull(), split2[2].toInt())
-                val trip3 = Triple(split3[0].toInt(), split3[1].toIntOrNull(), split3[2].toInt())
+                val pointInFaceMap1 = faceMap.get( point1 )
 
-                val fm1 = faceMap.get( trip1 )
-                val fm2 = faceMap.get( trip2 )
-                val fm3 = faceMap.get( trip3 )
+                if ( null != pointInFaceMap1 ) {
 
-                if ( null != fm1 ) {
-
-                    mIndices.add(fm1)
+                    mFinalIndices.add(pointInFaceMap1)
 
                 } else {
 
                     // add this sequence to the map
-                    faceMap.put(trip1, nextIndex)
+                    faceMap.put(point1, nextIndex)
 
                     // add vertex data
-                    mVertices.add(vertices[trip1.first - 1].first)
-                    mVertices.add(vertices[trip1.first - 1].second)
-                    mVertices.add(vertices[trip1.first - 1].third)
+                    mFinalVertices.add(vertices[point1.first - 1].first)
+                    mFinalVertices.add(vertices[point1.first - 1].second)
+                    mFinalVertices.add(vertices[point1.first - 1].third)
 
                     // add uvs if present
-                    if ( null != trip1.second ) {
-                        mUVs.add(uvs[trip1.second!! - 1].first)
-                        mUVs.add(uvs[trip1.second!! - 1].second)
+                    if ( null != point1.second ) {
+                        mFinalUVs.add(uvs[point1.second!! - 1].first)
+                        mFinalUVs.add(uvs[point1.second!! - 1].second)
                     }
 
-                    // add normals
-                    mNormals.add(normals[trip1.third - 1].first)
-                    mNormals.add(normals[trip1.third - 1].second)
-                    mNormals.add(normals[trip1.third - 1].third)
+                    // add normals if present
+                    if ( null != point1.third ) {
+                        mFinalNormals.add(normals[point1.third!! - 1].first)
+                        mFinalNormals.add(normals[point1.third!! - 1].second)
+                        mFinalNormals.add(normals[point1.third!! - 1].third)
+                    }
 
                     // and finally add the index
-                    mIndices.add(nextIndex++)
+                    mFinalIndices.add(nextIndex++)
                 }
 
-                if ( null != fm2 ) {
+                // get the second vertex, uv and normal
+                val vun2 = split[2].split("/")
+                val point2 = Triple(vun2[0].toInt(), vun2[1].toIntOrNull(), vun2[2].toIntOrNull())
+                val pointInFaceMap2 = faceMap.get( point2 )
+                
+                if ( null != pointInFaceMap2 ) {
 
-                    mIndices.add(fm2)
+                    mFinalIndices.add(pointInFaceMap2)
 
                 } else {
 
                     // add this sequence to the map
-                    faceMap.put(trip2, nextIndex)
+                    faceMap.put(point2, nextIndex)
 
                     // add vertex data
-                    mVertices.add(vertices[trip2.first - 1].first)
-                    mVertices.add(vertices[trip2.first - 1].second)
-                    mVertices.add(vertices[trip2.first - 1].third)
+                    mFinalVertices.add(vertices[point2.first - 1].first)
+                    mFinalVertices.add(vertices[point2.first - 1].second)
+                    mFinalVertices.add(vertices[point2.first - 1].third)
 
                     // add uvs if present
-                    if ( null != trip2.second ) {
-                        mUVs.add(uvs[trip2.second!! - 1].first)
-                        mUVs.add(uvs[trip2.second!! - 1].second)
+                    if ( null != point2.second ) {
+                        mFinalUVs.add(uvs[point2.second!! - 1].first)
+                        mFinalUVs.add(uvs[point2.second!! - 1].second)
                     }
 
-                    // add normals
-                    mNormals.add(normals[trip2.third - 1].first)
-                    mNormals.add(normals[trip2.third - 1].second)
-                    mNormals.add(normals[trip2.third - 1].third)
+                    // add normals if present
+                    if ( null != point2.third ) {
+                        mFinalNormals.add(normals[point2.third!! - 1].first)
+                        mFinalNormals.add(normals[point2.third!! - 1].second)
+                        mFinalNormals.add(normals[point2.third!! - 1].third)
+                    }
 
                     // and finally add the index
-                    mIndices.add(nextIndex++)
+                    mFinalIndices.add(nextIndex++)
                 }
 
-                if ( null != fm3 ) {
+                // get the third vertex, uv and normal
+                val vun3 = split[3].split("/")
+                val point3 = Triple(vun3[0].toInt(), vun3[1].toIntOrNull(), vun3[2].toIntOrNull())
+                val pointInFaceMap3 = faceMap.get( point3 )
+                
+                if ( null != pointInFaceMap3 ) {
 
-                    mIndices.add(fm3)
+                    mFinalIndices.add(pointInFaceMap3)
 
                 } else {
 
                     // add this sequence to the map
-                    faceMap.put(trip3, nextIndex)
+                    faceMap.put(point3, nextIndex)
 
                     // add vertex data
-                    mVertices.add(vertices[trip3.first - 1].first)
-                    mVertices.add(vertices[trip3.first - 1].second)
-                    mVertices.add(vertices[trip3.first - 1].third)
+                    mFinalVertices.add(vertices[point3.first - 1].first)
+                    mFinalVertices.add(vertices[point3.first - 1].second)
+                    mFinalVertices.add(vertices[point3.first - 1].third)
 
                     // add uvs if present
-                    if ( null != trip3.second ) {
-                        mUVs.add(uvs[trip3.second!! - 1].first)
-                        mUVs.add(uvs[trip3.second!! - 1].second)
+                    if ( null != point3.second ) {
+                        mFinalUVs.add(uvs[point3.second!! - 1].first)
+                        mFinalUVs.add(uvs[point3.second!! - 1].second)
                     }
 
-                    // add normals
-                    mNormals.add(normals[trip3.third - 1].first)
-                    mNormals.add(normals[trip3.third - 1].second)
-                    mNormals.add(normals[trip3.third - 1].third)
+                    // add normals if present
+                    if ( null != point3.third ) {
+                        mFinalNormals.add(normals[point3.third!! - 1].first)
+                        mFinalNormals.add(normals[point3.third!! - 1].second)
+                        mFinalNormals.add(normals[point3.third!! - 1].third)
+                    }
 
                     // and finally add the index
-                    mIndices.add(nextIndex++)
+                    mFinalIndices.add(nextIndex++)
                 }
             }
         }
     }
 
+    /**
+     * returns the parsed vertices in float array form
+     */
     fun getVertices(): FloatArray {
-        return mVertices.toFloatArray()
+        return mFinalVertices.toFloatArray()
     }
 
+    /**
+     * returns the parsed uv coordinates in float array form
+     */
+    fun getUVs(): FloatArray {
+        return mFinalUVs.toFloatArray()
+    }
+
+    /**
+     * returns the parsed normals in float array form
+     */
+    fun getNormals(): FloatArray {
+        return mFinalNormals.toFloatArray()
+    }
+
+    /**
+     * returns the parsed indices in short array form
+     */
     fun getIndices(): ShortArray {
-        return mIndices.toShortArray()
+        return mFinalIndices.toShortArray()
     }
 }
