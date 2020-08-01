@@ -13,26 +13,49 @@ abstract class AbstractGameObject() {
     private val COORDS_PER_VERTEX = 3
     private val BYTES_PER_FLOAT = 4
     private val BYTES_PER_SHORT = 2
+    private val NORMALS_PER_VERTEX = 3
 
-    private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
+    private val mVertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
+    private val mNormalStride: Int = NORMALS_PER_VERTEX * BYTES_PER_FLOAT
 
     private val vertexShaderCode =
     // This matrix member variable provides a hook to manipulate
         // the coordinates of the objects that use this vertex shader
-        "uniform mat4 uMVPMatrix;" +
-                "attribute vec4 vPosition;" +
+        "uniform mat4 uVPMatrix;" +
+                "uniform mat4 uMMatrix;" +
+                "attribute vec3 vPosition;" +
+                "attribute vec3 vNormal;" +
+                "varying vec3 vWorldPos;" +
+                "varying vec3 vNorm;" +
                 "void main() {" +
                 // the matrix must be included as a modifier of gl_Position
                 // Note that the uMVPMatrix factor *must be first* in order
                 // for the matrix multiplication product to be correct.
-                "  gl_Position = uMVPMatrix * vPosition;" +
+                " gl_Position = uVPMatrix * uMMatrix * vec4(vPosition, 1.0);" +
+                // passed to fragment shader for lighting
+                " vWorldPos = vec3(uMMatrix * vec4(vPosition, 1.0));" +
+                " vNorm = vNormal;" +
                 "}"
 
     private val fragmentShaderCode =
         "precision mediump float;" +
-                "uniform vec4 vColor;" +
+                "uniform vec4 uColour;" +
+                "varying vec3 vWorldPos;" +
+                "varying vec3 vNorm;" +
                 "void main() {" +
-                "  gl_FragColor = vColor;" +
+                // light colour is used for all lighting calculations
+                " vec3 vLightColour = vec3(1.0, 1.0, 1.0);" +
+                // Ambient lighting
+                " float fAmbientStrength = 0.3;" +
+                " vec3 vAmbient = (vLightColour * fAmbientStrength);" +
+                // Diffuse lighting
+                " vec3 vNormalisedNorm = normalize(vNorm);" +
+                " vec3 vLightDirection = normalize(vec3(0.0, 100.0, 0.0) - vWorldPos);" +
+                " float fDiff = max(dot(vNormalisedNorm, vLightDirection), 0.0);" +
+                " vec3 vDiffuse = (vLightColour * fDiff);" +
+                // Final colour
+                " vec3 vFinalColour = (vAmbient + vDiffuse) * uColour.xyz;" +
+                " gl_FragColor = vec4(vFinalColour, uColour.w);" +
                 "}"
 
     // Parameters which are set in the setParameter function.
@@ -141,42 +164,66 @@ abstract class AbstractGameObject() {
                     COORDS_PER_VERTEX,
                     GLES20.GL_FLOAT,
                     false,
-                    vertexStride,
+                    mVertexStride,
                     mVerticesBuffer
                 )
 
-                GLES20.glGetUniformLocation(mProgram, "vColor").also { colourHandle ->
-                    GLES20.glUniform4fv(colourHandle, 1, mColourRGBA, 0)
+                GLES20.glGetAttribLocation(mProgram, "vNormal").also {
+                    GLES20.glEnableVertexAttribArray(it)
+                    GLES20.glVertexAttribPointer(
+                        it,
+                        NORMALS_PER_VERTEX,
+                        GLES20.GL_FLOAT,
+                        false,
+                        mNormalStride,
+                        mNormalsBuffer
+                    )
+
+                    // generate the model matrix Note Currently this is only a translation
+                    val translationMatrix = FloatArray(16)
+                    Matrix.setIdentityM(
+                        translationMatrix,
+                        0
+                    )   // ensure we are starting from identity
+                    Matrix.translateM(
+                        translationMatrix,
+                        0,
+                        mPosition.getX(),
+                        mPosition.getY(),
+                        mPosition.getZ()
+                    )
+
+                    val scaleMatrix = FloatArray(16).also {
+                        Matrix.setIdentityM(it, 0)
+                        Matrix.scaleM(it, 0, mScale.getX(), mScale.getY(), mScale.getZ())
+                    }
+
+                    val modelMatrix = FloatArray(16).also {
+                        Matrix.multiplyMM(it, 0, translationMatrix, 0, scaleMatrix, 0)
+                    }
+
+                    GLES20.glGetUniformLocation(mProgram, "uVPMatrix").also { matrixHandle ->
+                        GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
+                    }
+
+                    GLES20.glGetUniformLocation(mProgram, "uMMatrix").also { matrixHandle ->
+                        GLES20.glUniformMatrix4fv(matrixHandle, 1, false, modelMatrix, 0)
+                    }
+
+                    GLES20.glGetUniformLocation(mProgram, "uColour").also { colourHandle ->
+                        GLES20.glUniform4fv(colourHandle, 1, mColourRGBA, 0)
+                    }
+
+                    GLES20.glDrawElements(
+                        GLES20.GL_TRIANGLES,
+                        mIndexCount,
+                        GLES20.GL_UNSIGNED_SHORT,
+                        mIndicesBuffer
+                    )
+
+                    GLES20.glDisableVertexAttribArray(it)
                 }
 
-                // generate the model matrix Note Currently this is only a translation
-                val translationMatrix = FloatArray(16)
-                Matrix.setIdentityM(translationMatrix, 0)   // ensure we are starting from identity
-                Matrix.translateM(translationMatrix, 0, mPosition.getX(), mPosition.getY(), mPosition.getZ())
-
-                val scaleMatrix = FloatArray(16).also {
-                    Matrix.setIdentityM(it, 0)
-                    Matrix.scaleM(it, 0, mScale.getX(), mScale.getY(), mScale.getZ())
-                }
-
-                val modelMatrix = FloatArray(16).also {
-                    Matrix.multiplyMM(it, 0, translationMatrix, 0, scaleMatrix, 0)
-                }
-
-                // add the model matrix to the view projection matrix to create the model view projection matrix.
-                val mvpMatrix = FloatArray(16)
-                Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, modelMatrix, 0)
-
-                GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
-                    GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mvpMatrix, 0)
-                }
-
-                GLES20.glDrawElements(
-                    GLES20.GL_TRIANGLES,
-                    mIndexCount,
-                    GLES20.GL_UNSIGNED_SHORT,
-                    mIndicesBuffer
-                )
                 GLES20.glDisableVertexAttribArray(it)
             }
         }

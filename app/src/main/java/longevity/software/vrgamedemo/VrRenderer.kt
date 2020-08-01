@@ -142,15 +142,14 @@ class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceVi
         GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         GLES20.glDepthFunc(GLES20.GL_LEQUAL)
 
-        val cube = ObjectFileParser(mContext, "square.obj")
         val torus = ObjectFileParser(mContext, "torus.obj")
 
         // initialise the game objects which will be drawn
-        mGameObjectList.add(GenericGameObject(0, cube.getVertices(), cube.getIndices(), cube.getNormals()))
+        mGameObjectList.add(GenericGameObject(0, torus.getVertices(), torus.getIndices(), torus.getNormals()))
         mGameObjectList.add(GenericGameObject(1, torus.getVertices(), torus.getIndices(), torus.getNormals()))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(0.0f, 0.0f, 6.0f))
+        mGameObjectList[0].setPosition(Vector3Float(0.0f, 0.0f, 3.0f))
         mGameObjectList[1].setPosition(Vector3Float(0.0f, 0.0f, -6.0f))
 
         // set up the projection matrix for rendering to the framebuffers
