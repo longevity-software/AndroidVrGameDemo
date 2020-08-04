@@ -38,23 +38,41 @@ abstract class AbstractGameObject() {
                 "}"
 
     private val fragmentShaderCode =
-        "precision mediump float;" +
+                "precision highp float;" +
                 "uniform vec4 uColour;" +
+                "uniform vec3 uCameraPos;" +
+                "uniform vec3 uLightPos;" +
                 "varying vec3 vWorldPos;" +
                 "varying vec3 vNorm;" +
+                "const float cfToonShaderLevels = 4.0;" +
+                //
+                "float toonify(float intensity, float levels) {" +
+                " float level = floor(intensity * levels);" +
+                " return (level / levels);" +
+                "}" +
+                //
                 "void main() {" +
-                // light colour is used for all lighting calculations
+                // variables used for multiple lighting calculations
                 " vec3 vLightColour = vec3(1.0, 1.0, 1.0);" +
+                " vec3 vNormalisedNorm = normalize(vNorm);" +
+                " vec3 vLightDirection = normalize(uLightPos - vWorldPos);" +
                 // Ambient lighting
                 " float fAmbientStrength = 0.3;" +
                 " vec3 vAmbient = (vLightColour * fAmbientStrength);" +
                 // Diffuse lighting
-                " vec3 vNormalisedNorm = normalize(vNorm);" +
-                " vec3 vLightDirection = normalize(vec3(0.0, 100.0, 0.0) - vWorldPos);" +
-                " float fDiff = max(dot(vNormalisedNorm, vLightDirection), 0.0);" +
-                " vec3 vDiffuse = (vLightColour * fDiff);" +
+                " float fDiffuse = max(dot(vNormalisedNorm, vLightDirection), 0.0);" +
+                " vec3 vDiffuse = (vLightColour * toonify(fDiffuse, cfToonShaderLevels));" +
+                //" vec3 vDiffuse = (vLightColour * fDiff);" +
+                // Specular lighting
+                " float fSpecularStrength = 0.5;" +
+                " vec3 vViewDirection = normalize(uCameraPos - vWorldPos);" +
+                " vec3 vReflectionDirection = reflect(-vLightDirection, vNormalisedNorm);" +
+                " float fSpecDot = min(max(dot(vReflectionDirection, vViewDirection), 0.0), 1.0);" +
+                " float fSpecular = pow(fSpecDot, 32.0);" +
+                " vec3 vSpecular = (vLightColour * fSpecularStrength * toonify(fSpecular, cfToonShaderLevels));" +
+                //" vec3 vSpecular = (vLightColour * fSpecularStrength * fSpecPower);" +
                 // Final colour
-                " vec3 vFinalColour = (vAmbient + vDiffuse) * uColour.xyz;" +
+                " vec3 vFinalColour = (vAmbient + vDiffuse + vSpecular) * uColour.xyz;" +
                 " gl_FragColor = vec4(vFinalColour, uColour.w);" +
                 "}"
 
@@ -72,6 +90,7 @@ abstract class AbstractGameObject() {
     // variables used to generate the model matrix
     private var mPosition: Vector3Float
     private var mScale: Vector3Float
+    private var mRotation: Float
 
     /**
      * AbstractGameObject init block which creates the program and loads shaders.
@@ -83,6 +102,7 @@ abstract class AbstractGameObject() {
         // set the initial position.
         mPosition = Vector3Float(0.0f, 0.0f, 0.0f)
         mScale = Vector3Float(1.0f, 1.0f, 1.0f)
+        mRotation = 90.0f
 
         val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
@@ -151,7 +171,7 @@ abstract class AbstractGameObject() {
      * Function which draws the model using the view projection matrix passed if
      * the parameters have been set.
      */
-    fun draw(vpMatrix: FloatArray) {
+    fun draw(vpMatrix: FloatArray, lightPos: Vector3Float, cameraPos: Vector3Float) {
 
         if (mParametersHaveBeenSet) {
 
@@ -198,8 +218,15 @@ abstract class AbstractGameObject() {
                         Matrix.scaleM(it, 0, mScale.getX(), mScale.getY(), mScale.getZ())
                     }
 
+                    val rotationMatrix = FloatArray(16).also {
+                        Matrix.setRotateM(it, 0, mRotation, 0.0f, 1.0f, 0.0f);
+                    }
+
+                    mRotation = (mRotation + 1.0f) % 360.0f;
+
                     val modelMatrix = FloatArray(16).also {
-                        Matrix.multiplyMM(it, 0, translationMatrix, 0, scaleMatrix, 0)
+                        Matrix.multiplyMM(it, 0, rotationMatrix, 0, scaleMatrix, 0)
+                        Matrix.multiplyMM(it, 0, translationMatrix, 0, it, 0)
                     }
 
                     GLES20.glGetUniformLocation(mProgram, "uVPMatrix").also { matrixHandle ->
@@ -212,6 +239,14 @@ abstract class AbstractGameObject() {
 
                     GLES20.glGetUniformLocation(mProgram, "uColour").also { colourHandle ->
                         GLES20.glUniform4fv(colourHandle, 1, mColourRGBA, 0)
+                    }
+
+                    GLES20.glGetUniformLocation(mProgram, "uLightPos").also { lightPosHandle ->
+                        GLES20.glUniform3fv(lightPosHandle, 1, floatArrayOf(lightPos.getX(), lightPos.getY(), lightPos.getZ()), 0)
+                    }
+
+                    GLES20.glGetUniformLocation(mProgram, "uCameraPos").also { cameraPosHandle ->
+                        GLES20.glUniform3fv(cameraPosHandle, 1, floatArrayOf(cameraPos.getX(), cameraPos.getY(), cameraPos.getZ()), 0)
                     }
 
                     GLES20.glDrawElements(

@@ -142,15 +142,17 @@ class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceVi
         GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         GLES20.glDepthFunc(GLES20.GL_LEQUAL)
 
-        val torus = ObjectFileParser(mContext, "torus.obj")
+        GLES20.glEnable(GLES20.GL_CULL_FACE)
+
+        val torus = ObjectFileParser(mContext, "smoothTorus.obj")
 
         // initialise the game objects which will be drawn
         mGameObjectList.add(GenericGameObject(0, torus.getVertices(), torus.getIndices(), torus.getNormals()))
-        mGameObjectList.add(GenericGameObject(1, torus.getVertices(), torus.getIndices(), torus.getNormals()))
+        //mGameObjectList.add(GenericGameObject(1, torus.getVertices(), torus.getIndices(), torus.getNormals()))
 
         // set the position of these objects.
         mGameObjectList[0].setPosition(Vector3Float(0.0f, 0.0f, 3.0f))
-        mGameObjectList[1].setPosition(Vector3Float(0.0f, 0.0f, -6.0f))
+        //mGameObjectList[1].setPosition(Vector3Float(0.0f, 0.0f, -6.0f))
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
@@ -265,7 +267,10 @@ class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceVi
 
         // draw all the game objects in the list.
         for (gameObject in mGameObjectList) {
-            gameObject.draw(viewProjectionMatrix)
+            gameObject.draw(viewProjectionMatrix,
+                            Vector3Float(0.0f, 100.0f, 0.0f),
+                            Vector3Float(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
+            )
         }
 
         // set the camera based on the passed GameCamera but without the translation element
