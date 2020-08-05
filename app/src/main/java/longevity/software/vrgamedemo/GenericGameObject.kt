@@ -1,6 +1,6 @@
 package longevity.software.vrgamedemo
 
-class GenericGameObject(colour: Int, vertices: FloatArray, indices: ShortArray, normals: FloatArray) :AbstractGameObject() {
+class GenericGameObject(colour: Int, modelData: ModelData) :AbstractGameObject() {
 
     private val mGreenRGBA = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
     private val mBlueRGBA = floatArrayOf(0.22265625f, 0.63671875f, 0.76953125f, 1.0f)
@@ -10,10 +10,10 @@ class GenericGameObject(colour: Int, vertices: FloatArray, indices: ShortArray, 
      */
     init {
         if ( 0 == colour ) {
-            super.SetParameters(vertices, indices, normals, mBlueRGBA)
+            super.SetParameters(modelData.mVertices, modelData.mIndices, modelData.mNormals, mBlueRGBA)
         }
         else {
-            super.SetParameters(vertices, indices, normals, mGreenRGBA)
+            super.SetParameters(modelData.mVertices, modelData.mIndices, modelData.mNormals, mGreenRGBA)
         }
     }
 }

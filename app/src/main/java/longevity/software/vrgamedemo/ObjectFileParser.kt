@@ -169,30 +169,12 @@ class ObjectFileParser(context: Context, file: String) {
     }
 
     /**
-     * returns the parsed vertices in float array form
+     * returns the Model data which has been parsed
      */
-    fun getVertices(): FloatArray {
-        return mFinalVertices.toFloatArray()
-    }
-
-    /**
-     * returns the parsed uv coordinates in float array form
-     */
-    fun getUVs(): FloatArray {
-        return mFinalUVs.toFloatArray()
-    }
-
-    /**
-     * returns the parsed normals in float array form
-     */
-    fun getNormals(): FloatArray {
-        return mFinalNormals.toFloatArray()
-    }
-
-    /**
-     * returns the parsed indices in short array form
-     */
-    fun getIndices(): ShortArray {
-        return mFinalIndices.toShortArray()
+    fun getModelData(): ModelData {
+        return ModelData(mFinalVertices.toFloatArray(),
+            mFinalNormals.toFloatArray(),
+            mFinalUVs.toFloatArray(),
+            mFinalIndices.toShortArray())
     }
 }

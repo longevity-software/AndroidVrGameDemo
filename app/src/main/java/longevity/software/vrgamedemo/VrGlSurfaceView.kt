@@ -3,7 +3,7 @@ package longevity.software.vrgamedemo
 import android.content.Context
 import android.opengl.GLSurfaceView
 
-class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceView(context){
+class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox, modelLoader: ModelLoader) : GLSurfaceView(context){
 
     private val mRenderer: VrRenderer
 
@@ -16,7 +16,7 @@ class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurf
         setEGLContextClientVersion(2)
 
         // instantiate the renderer and set it to be used
-        mRenderer = VrRenderer(context, vis, sky)
+        mRenderer = VrRenderer(modelLoader, vis, sky)
         setRenderer(mRenderer)
 
         // set it to only render when we want it to.

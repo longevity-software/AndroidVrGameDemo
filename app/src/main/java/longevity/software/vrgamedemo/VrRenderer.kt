@@ -1,6 +1,5 @@
 package longevity.software.vrgamedemo
 
-import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
@@ -10,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
+class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mProjectionMatrix = FloatArray(16)
@@ -24,7 +23,7 @@ class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceVi
     private var mLeftCamera = vis.getLeftEyeCamera()
 
     // local copy of the context
-    private val mContext = context
+    private val mModelLoader = modelLoader
 
     // framebuffer constants
     private val TEXTURE_WIDTH: Int = 768
@@ -144,15 +143,13 @@ class VrRenderer(context: Context, vis: PlayerVision, sky: SkyBox) : GLSurfaceVi
 
         GLES20.glEnable(GLES20.GL_CULL_FACE)
 
-        val torus = ObjectFileParser(mContext, "smoothTorus.obj")
-
         // initialise the game objects which will be drawn
-        mGameObjectList.add(GenericGameObject(0, torus.getVertices(), torus.getIndices(), torus.getNormals()))
-        //mGameObjectList.add(GenericGameObject(1, torus.getVertices(), torus.getIndices(), torus.getNormals()))
+        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.TOROID_MODEL)))
+        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.SUZANNE_MODEL)))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(0.0f, 0.0f, 3.0f))
-        //mGameObjectList[1].setPosition(Vector3Float(0.0f, 0.0f, -6.0f))
+        mGameObjectList[0].setPosition(Vector3Float(1.0f, 0.0f, 3.0f))
+        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 0.0f, 3.0f))
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
