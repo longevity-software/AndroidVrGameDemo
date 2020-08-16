@@ -4,8 +4,10 @@ import android.content.Context
 
 class ModelLoader(context: Context) {
 
-    val SUZANNE_MODEL = "suzanne.obj"
-    val TOROID_MODEL = "smoothTorus.obj"
+    val HOUSE_MODEL = "House.obj"
+    val PLANE_MODEL = "Plane.obj"
+    val STATUE_MODEL = "Statue.obj"
+    val WELL_MODEL = "Well.obj"
 
     private val mModelMap = HashMap<String, ModelData>()
     private val mDefaultModel: ModelData
@@ -14,8 +16,10 @@ class ModelLoader(context: Context) {
         // load all the models
         mDefaultModel = ObjectFileParser(context, "cube.obj").getModelData()
 
-        mModelMap.put(SUZANNE_MODEL, ObjectFileParser(context, SUZANNE_MODEL).getModelData())
-        mModelMap.put(TOROID_MODEL, ObjectFileParser(context, TOROID_MODEL).getModelData())
+        mModelMap.put(HOUSE_MODEL, ObjectFileParser(context, HOUSE_MODEL).getModelData())
+        mModelMap.put(PLANE_MODEL, ObjectFileParser(context, PLANE_MODEL).getModelData())
+        mModelMap.put(STATUE_MODEL, ObjectFileParser(context, STATUE_MODEL).getModelData())
+        mModelMap.put(WELL_MODEL, ObjectFileParser(context, WELL_MODEL).getModelData())
     }
 
     /**

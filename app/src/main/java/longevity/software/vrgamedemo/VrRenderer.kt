@@ -52,8 +52,8 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
     private var mScreenHeight: Int = 0
 
     // Vies constants
-    private val NEAR_DISTANCE = 1.0f
-    private val FAR_DISTANCE = 10.0f
+    private val NEAR_DISTANCE = 0.5f
+    private val FAR_DISTANCE = 50.0f
 
     /**
      * Function called when the surface is created.
@@ -144,12 +144,16 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
         GLES20.glEnable(GLES20.GL_CULL_FACE)
 
         // initialise the game objects which will be drawn
-        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.TOROID_MODEL)))
-        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.SUZANNE_MODEL)))
+        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
+        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.PLANE_MODEL)))
+        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.STATUE_MODEL)))
+        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.WELL_MODEL)))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(1.0f, 0.0f, 3.0f))
-        mGameObjectList[1].setPosition(Vector3Float(-1.0f, 0.0f, 3.0f))
+        mGameObjectList[0].setPosition(Vector3Float(10.0f, 0.0f, 10.0f))
+        mGameObjectList[1].setPosition(Vector3Float(10.0f, 0.0f, -10.0f))
+        mGameObjectList[2].setPosition(Vector3Float(-10.0f, 0.0f, 10.0f))
+        mGameObjectList[3].setPosition(Vector3Float(-10.0f, 0.0f, -10.0f))
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()

@@ -9,13 +9,11 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
 
     // constants.
     private val COORDS_PER_VERTEX = 3
-    private val COLOURS_PER_VERTEX = 4
     private val BYTES_PER_FLOAT = 4
     private val BYTES_PER_PIXEL = 3
     private val BYTES_PER_SHORT = 2
 
     private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
-    private val colourStride: Int = COLOURS_PER_VERTEX * BYTES_PER_FLOAT
 
     private val vertexShaderCode =
     // This matrix member variable provides a hook to manipulate
@@ -43,7 +41,6 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
 
     // buffers used to render the skybox.
     private var mVertexBuffer: FloatBuffer
-    private var mColourBuffer: FloatBuffer
     private var mIndicesBuffer: ShortBuffer
     private var mTextureBuffer: IntBuffer
     private var mTextureData: Array<TextureData>
@@ -72,22 +69,11 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
         4, 7, 6,    // rear
         7, 2, 6,    //
         7, 3, 2,    // right
-        0, 7, 3,    //
-        0, 4, 7,    // top
-        1, 6, 5,    //
-        1, 2, 6     // bottom
+        0, 3, 7,    //
+        0, 7, 4,    // top
+        1, 5, 6,    //
+        1, 6, 2     // bottom
     )
-
-    private val colourRGBA: FloatArray =  floatArrayOf(
-        0.76953125f, 0.22265625f, 0.63671875f, 1.0f,
-        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
-        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
-        0.76953125f, 0.22265625f, 0.63671875f, 1.0f,
-        0.76953125f, 0.22265625f, 0.63671875f, 1.0f,
-        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
-        0.22265625f, 0.63671875f, 0.76953125f, 1.0f,
-        0.76953125f, 0.22265625f, 0.63671875f, 1.0f
-        )
 
     /**
      * AbstractGameObject init block which creates the program and loads shaders.
@@ -100,15 +86,6 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
                 order(ByteOrder.nativeOrder())
                 asFloatBuffer().apply {
                     put(vertexCoordsArray)
-                    position(0)
-                }
-            }
-
-        mColourBuffer =
-            ByteBuffer.allocateDirect(colourRGBA.size * BYTES_PER_FLOAT).run {
-                order(ByteOrder.nativeOrder())
-                asFloatBuffer().apply {
-                    put(colourRGBA)
                     position(0)
                 }
             }

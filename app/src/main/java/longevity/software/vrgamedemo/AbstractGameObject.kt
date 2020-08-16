@@ -102,7 +102,7 @@ abstract class AbstractGameObject() {
         // set the initial position.
         mPosition = Vector3Float(0.0f, 0.0f, 0.0f)
         mScale = Vector3Float(1.0f, 1.0f, 1.0f)
-        mRotation = 90.0f
+        mRotation = 0.0f
 
         val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
@@ -221,8 +221,6 @@ abstract class AbstractGameObject() {
                     val rotationMatrix = FloatArray(16).also {
                         Matrix.setRotateM(it, 0, mRotation, 0.0f, 1.0f, 0.0f);
                     }
-
-                    mRotation = (mRotation + 1.0f) % 360.0f;
 
                     val modelMatrix = FloatArray(16).also {
                         Matrix.multiplyMM(it, 0, rotationMatrix, 0, scaleMatrix, 0)

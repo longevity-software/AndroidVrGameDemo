@@ -4,11 +4,13 @@ import android.opengl.Matrix
 
 class PlayerVision {
 
-    private val mLeftEye = GameCamera(0.0f,1.0f,0.0f,
+    private val PLAYER_Y: Float = 3.0f
+
+    private val mLeftEye = GameCamera(0.0f,3.0f,0.0f,
                              0.0f, 0.0f, 1.0f,
                                 0.0f, 1.0f, 0.0f)
 
-    private val mRightEye = GameCamera(0.0f,1.0f,0.0f,
+    private val mRightEye = GameCamera(0.0f,3.0f,0.0f,
         0.0f, 0.0f, 1.0f,
         0.0f, 1.0f, 0.0f)
 
@@ -97,12 +99,12 @@ class PlayerVision {
         // update the cameras with their new positions
         mLeftEye.setPosition(
             Vector3Float((leftCameraPositionMatrix.get(12) + x),
-                leftCameraPositionMatrix.get(13),
+                leftCameraPositionMatrix.get(13) + PLAYER_Y,
                 (leftCameraPositionMatrix.get(14) + z))
         )
         mRightEye.setPosition(
             Vector3Float((rightCameraPositionMatrix.get(12) + x),
-                rightCameraPositionMatrix.get(13),
+                rightCameraPositionMatrix.get(13) + PLAYER_Y,
                 (rightCameraPositionMatrix.get(14) + z))
         )
 
