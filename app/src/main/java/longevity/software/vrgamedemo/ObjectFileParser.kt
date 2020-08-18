@@ -175,6 +175,11 @@ class ObjectFileParser(context: Context, file: String) {
         return ModelData(mFinalVertices.toFloatArray(),
             mFinalNormals.toFloatArray(),
             mFinalUVs.toFloatArray(),
-            mFinalIndices.toShortArray())
+            mFinalIndices.toShortArray(),
+            emptyArray<Float>().toFloatArray(),
+            emptyArray<Float>().toFloatArray(),
+            emptyArray<Float>().toFloatArray(),
+            emptyArray<Float>().toFloatArray(),
+            emptyArray<Float>().toFloatArray())
     }
 }

@@ -1,9 +1,13 @@
 package longevity.software.vrgamedemo
 
-class ModelData(vertices: FloatArray, normals: FloatArray, uvs: FloatArray, indices: ShortArray) {
+data class ModelData(val mVertices: FloatArray,
+                     val mNormals: FloatArray,
+                     val mUVs: FloatArray,
+                     val mIndices: ShortArray,
+                     val mAmbientColour: FloatArray,
+                     val mDiffuseColour: FloatArray,
+                     val mSpecularColour: FloatArray,
+                     val mSpecularExponent: FloatArray,
+                     val mTransparency: FloatArray) {
 
-    val mVertices = vertices
-    val mNormals = normals
-    val mUVs = uvs
-    val mIndices = indices
 }

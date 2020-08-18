@@ -145,9 +145,9 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
 
         // initialise the game objects which will be drawn
         mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
-        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.PLANE_MODEL)))
-        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.STATUE_MODEL)))
-        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.WELL_MODEL)))
+        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
+        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
+        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
 
         // set the position of these objects.
         mGameObjectList[0].setPosition(Vector3Float(10.0f, 0.0f, 10.0f))
