@@ -8,6 +8,6 @@ data class ModelData(val mVertices: FloatArray,
                      val mDiffuseColour: FloatArray,
                      val mSpecularColour: FloatArray,
                      val mSpecularExponent: FloatArray,
-                     val mTransparency: FloatArray) {
+                     val mDissolve: FloatArray) {
 
 }

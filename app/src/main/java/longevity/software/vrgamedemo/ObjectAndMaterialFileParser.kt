@@ -15,7 +15,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
     private var mFinalDiffuseColour = mutableListOf<Float>()
     private var mFinalSpecularColour = mutableListOf<Float>()
     private var mFinalSpecularExponent = mutableListOf<Float>()
-    private var mFinalTransparency = mutableListOf<Float>()
+    private var mFinalDissolve = mutableListOf<Float>()
 
     private val mMaterials = HashMap<String, MaterialData>()
 
@@ -29,7 +29,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
         val normals = ArrayList<Triple<Float, Float, Float>>()
         val uvs = ArrayList<Pair<Float, Float>>()
 
-        // face map which includes:
+        // face map which has a key:
         // Pair {
         //      material name,
         //      Triple {
@@ -137,7 +137,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
 
                         mFinalSpecularExponent.add(matData.mSpecularExponent)
 
-                        mFinalTransparency.add(matData.mTransparency)
+                        mFinalDissolve.add(matData.mDissolve)
                     } else {
                         // populate with default colours
                         mFinalAmbientColour.add(1.0f)
@@ -154,7 +154,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
 
                         mFinalSpecularExponent.add(32.0f)
 
-                        mFinalTransparency.add(1.0f)
+                        mFinalDissolve.add(1.0f)
                     }
 
                     // and finally add the index
@@ -214,7 +214,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
 
                         mFinalSpecularExponent.add(matData.mSpecularExponent)
 
-                        mFinalTransparency.add(matData.mTransparency)
+                        mFinalDissolve.add(matData.mDissolve)
                     } else {
                         // populate with default colours
                         mFinalAmbientColour.add(1.0f)
@@ -231,7 +231,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
 
                         mFinalSpecularExponent.add(32.0f)
 
-                        mFinalTransparency.add(1.0f)
+                        mFinalDissolve.add(1.0f)
                     }
 
                     // and finally add the index
@@ -290,7 +290,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
 
                         mFinalSpecularExponent.add(matData.mSpecularExponent)
 
-                        mFinalTransparency.add(matData.mTransparency)
+                        mFinalDissolve.add(matData.mDissolve)
                     } else {
                         // populate with default colours
                         mFinalAmbientColour.add(1.0f)
@@ -307,7 +307,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
 
                         mFinalSpecularExponent.add(32.0f)
 
-                        mFinalTransparency.add(1.0f)
+                        mFinalDissolve.add(1.0f)
                     }
 
                     // and finally add the index
@@ -391,7 +391,7 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
                 // update the last material added
                 mMaterials.get(currentMaterialName).also {
                     if ( null != it ) {
-                        it.mTransparency = dissolve[1].toFloat()
+                        it.mDissolve = dissolve[1].toFloat()
                     }
                 }
             }
@@ -410,6 +410,6 @@ class ObjectAndMaterialFileParser(context: Context, objFile: String) {
             mFinalDiffuseColour.toFloatArray(),
             mFinalSpecularColour.toFloatArray(),
             mFinalSpecularExponent.toFloatArray(),
-            mFinalTransparency.toFloatArray())
+            mFinalDissolve.toFloatArray())
     }
 }

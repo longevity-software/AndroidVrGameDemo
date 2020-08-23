@@ -144,10 +144,10 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
         GLES20.glEnable(GLES20.GL_CULL_FACE)
 
         // initialise the game objects which will be drawn
-        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
-        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
-        mGameObjectList.add(GenericGameObject(1, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
-        mGameObjectList.add(GenericGameObject(0, mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.SHELTER_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.SHELTER_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
 
         // set the position of these objects.
         mGameObjectList[0].setPosition(Vector3Float(10.0f, 0.0f, 10.0f))
@@ -269,7 +269,8 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
         // draw all the game objects in the list.
         for (gameObject in mGameObjectList) {
             gameObject.draw(viewProjectionMatrix,
-                            Vector3Float(0.0f, 100.0f, 0.0f),
+                            Vector3Float(0.0f, 100.0f, -100.0f),       // light position
+                            Triple(1.0f, 1.0f, 1.0f),        // light colour
                             Vector3Float(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
             )
         }
