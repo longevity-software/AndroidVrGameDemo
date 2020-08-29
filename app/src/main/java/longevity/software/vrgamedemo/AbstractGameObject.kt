@@ -241,7 +241,7 @@ abstract class AbstractGameObject() {
      * Function which draws the model using the view projection matrix passed if
      * the parameters have been set.
      */
-    fun draw(vpMatrix: FloatArray, lightPos: Vector3Float, lightColour: Triple<Float, Float, Float>, cameraPos: Vector3Float) {
+    fun draw(vpMatrix: FloatArray, lightPos: Triple<Float, Float, Float>, lightColour: Triple<Float, Float, Float>, cameraPos: Triple<Float, Float, Float>) {
 
         if (mParametersHaveBeenSet) {
 
@@ -393,9 +393,9 @@ abstract class AbstractGameObject() {
                                                     lightPosHandle,
                                                     1,
                                                     floatArrayOf(
-                                                        lightPos.getX(),
-                                                        lightPos.getY(),
-                                                        lightPos.getZ()
+                                                        lightPos.first,
+                                                        lightPos.second,
+                                                        lightPos.third
                                                     ),
                                                     0
                                                 )
@@ -421,9 +421,9 @@ abstract class AbstractGameObject() {
                                                     cameraPosHandle,
                                                     1,
                                                     floatArrayOf(
-                                                        cameraPos.getX(),
-                                                        cameraPos.getY(),
-                                                        cameraPos.getZ()
+                                                        cameraPos.first,
+                                                        cameraPos.second,
+                                                        cameraPos.third
                                                     ),
                                                     0
                                                 )
@@ -462,8 +462,15 @@ abstract class AbstractGameObject() {
     /**
      * function to change the position of the GameObject
      */
-    fun setPosition(pos: Vector3Float) {
-        mPosition = pos
+    fun setPosition(x: Float, y: Float, z: Float) {
+        mPosition = Vector3Float(x, y, z)
+    }
+
+    /**
+     * function to get the position
+     */
+    fun getPosition() : Triple<Float, Float, Float> {
+        return Triple(mPosition.getX(), mPosition.getY(), mPosition.getZ())
     }
 
     fun setScale(scale: Vector3Float) {

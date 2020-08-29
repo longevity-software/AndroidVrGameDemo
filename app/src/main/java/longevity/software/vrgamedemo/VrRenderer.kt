@@ -9,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLSurfaceView.Renderer {
+class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLight: SunLight) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mProjectionMatrix = FloatArray(16)
@@ -46,6 +46,7 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
 
     // the skybox background
     private val mSkyBox = sky
+    private val mSunLight = sunLight
 
     // View variables
     private var mScreenWidth: Int = 0
@@ -143,6 +144,9 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
 
         GLES20.glEnable(GLES20.GL_CULL_FACE)
 
+        // initialise the sunlight model
+        mSunLight.initialise()
+
         // initialise the game objects which will be drawn
         mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
         mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.SHELTER_MODEL)))
@@ -150,10 +154,10 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
         mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
 
         // set the position of these objects.
-        mGameObjectList[0].setPosition(Vector3Float(10.0f, 0.0f, 10.0f))
-        mGameObjectList[1].setPosition(Vector3Float(10.0f, 0.0f, -10.0f))
-        mGameObjectList[2].setPosition(Vector3Float(-10.0f, 0.0f, 10.0f))
-        mGameObjectList[3].setPosition(Vector3Float(-10.0f, 0.0f, -10.0f))
+        mGameObjectList[0].setPosition(10.0f, 0.0f, 10.0f)
+        mGameObjectList[1].setPosition(10.0f, 0.0f, -10.0f)
+        mGameObjectList[2].setPosition(-10.0f, 0.0f, 10.0f)
+        mGameObjectList[3].setPosition(-10.0f, 0.0f, -10.0f)
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
@@ -171,8 +175,6 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
         mScreenWidth = width
         mScreenHeight = height
     }
-
-
 
     /**
      * Function called when the frame is drawn.
@@ -269,17 +271,22 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox) : GLS
         // draw all the game objects in the list.
         for (gameObject in mGameObjectList) {
             gameObject.draw(viewProjectionMatrix,
-                            Vector3Float(0.0f, 100.0f, -100.0f),       // light position
-                            Triple(1.0f, 1.0f, 1.0f),        // light colour
-                            Vector3Float(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
+                            mSunLight.getSunPosition(),       // light position
+                            mSunLight.getLightColour(),        // light colour
+                            Triple(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
             )
         }
+
+        // render the sun
+        // set the light position as the camera position so that the sun is illuminated.
+        mSunLight.draw(viewProjectionMatrix)
 
         // set the camera based on the passed GameCamera but without the translation element
         Matrix.setLookAtM(skyboxViewMatrix, 0,
             0.0f, 0.0f, 0.0f,
             camera.getLookDirectionX(), camera.getLookDirectionY(), camera.getLookDirectionZ(),
-            camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ())
+            camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ()
+        )
 
         // create a view projection matrix without the translation
         Matrix.multiplyMM(skyboxViewProjectionMatrix, 0, mProjectionMatrix, 0, skyboxViewMatrix, 0)
