@@ -20,7 +20,7 @@ class SunLight(modelLoader: ModelLoader) {
     private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
 
     private val midDayColour = Triple(1.0f, 1.0f, 1.0f)
-    private val duskOrDawnColour = Triple(1.0f, 0.0f, 0.0f)
+    private val duskOrDawnColour = Triple(1.0f, 0.5f, 0.0f)
     private val earlyLateDayColour = Triple(1.0f, 1.0f, 0.0f)
     private val midNightColour = Triple(0.0f, 0.0f, 0.0f)
 
@@ -134,25 +134,54 @@ class SunLight(modelLoader: ModelLoader) {
         // set the position
         mSunPosition = Triple(sunPos[12], sunPos[13], sunPos[14])
 
+        val sunAngleInt = sunAngle.toInt()
+
         // set the light colour based on the angle
-        mLightColour = when (sunAngle.toInt()) {
-            in 90..100 -> {
-                duskOrDawnColour
+        mLightColour = when (sunAngleInt) {
+            in 90..99 -> {
+                val interp = ((10 - (100 - sunAngleInt)).toFloat() / 10.0f)
+                interpolateRGBColour(midNightColour, duskOrDawnColour, interp)
             }
-            in 101..140 -> {
-                earlyLateDayColour
+            in 100..139 -> {
+                val interp = ((40 - (139 - sunAngleInt)).toFloat() / 40.0f)
+                interpolateRGBColour(duskOrDawnColour, earlyLateDayColour, interp)
             }
-            in 141..220 -> {
-                midDayColour
+            in 140..179 -> {
+                val interp = ((40 - (179 - sunAngleInt)).toFloat() / 40.0f)
+                interpolateRGBColour(earlyLateDayColour, midDayColour, interp)
             }
-            in 221..260 -> {
-                earlyLateDayColour
+            in 180..219 -> {
+                val interp = ((40 - (219 - sunAngleInt)).toFloat() / 40.0f)
+                interpolateRGBColour(midDayColour, earlyLateDayColour, interp)
             }
-            in 261..270 -> {
-                duskOrDawnColour
+            in 220..259 -> {
+                val interp = ((40 - (259 - sunAngleInt)).toFloat() / 40.0f)
+                interpolateRGBColour(earlyLateDayColour, duskOrDawnColour, interp)
+            }
+            in 260..269 -> {
+                val interp = ((10 - (269 - sunAngleInt)).toFloat() / 10.0f)
+                interpolateRGBColour(duskOrDawnColour, midNightColour, interp)
             }
             else -> midNightColour
         }
+    }
+
+    /**
+     * Function to interpolate an RGB Colour triple.
+     * Note: This may not provide expected results if more than two of
+     * the RGB components change between the from and to colours.
+     */
+    private fun interpolateRGBColour(from: Triple<Float, Float, Float>,
+                                     to: Triple<Float, Float, Float>,
+                                     interp: Float) : Triple<Float, Float, Float> {
+
+        val diff = Triple((to.first - from.first),
+                                                (to.second - from.second),
+                                                (to.third - from.third))
+
+        return Triple((from.first + (diff.first * interp)),
+                        (from.second + (diff.second * interp)),
+                        (from.third + (diff.third * interp)))
     }
 
     /**
