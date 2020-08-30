@@ -54,7 +54,7 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
 
     // Vies constants
     private val NEAR_DISTANCE = 0.5f
-    private val FAR_DISTANCE = 50.0f
+    private val FAR_DISTANCE = 100.0f
 
     /**
      * Function called when the surface is created.
@@ -292,6 +292,6 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
         Matrix.multiplyMM(skyboxViewProjectionMatrix, 0, mProjectionMatrix, 0, skyboxViewMatrix, 0)
 
         // render the skybox
-        mSkyBox.draw(skyboxViewProjectionMatrix)
+        mSkyBox.draw(skyboxViewProjectionMatrix, mSunLight.getLightColour())
     }
 }

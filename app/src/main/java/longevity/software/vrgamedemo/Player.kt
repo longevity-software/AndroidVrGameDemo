@@ -44,4 +44,11 @@ class Player(originX: Float, originY: Float, originZ: Float, vis: PlayerVision) 
         // update what the player can see.
         mPlayerVision.setVision(headPitch, headYaw, mPlayerX, mPlayerZ)
     }
+
+    /**
+     * Gets the players current position as a Triple
+     */
+    fun getPosition() : Triple<Float, Float, Float> {
+        return Triple(mPlayerX, mPlayerY, mPlayerZ)
+    }
 }

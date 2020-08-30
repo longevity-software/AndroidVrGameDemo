@@ -35,8 +35,10 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
         "precision mediump float;" +
                 "varying vec3 vTextureCoords;" +
                 "uniform samplerCube skybox;" +
+                "uniform vec3 vLightColour;" +
                 "void main() {" +
-                "  gl_FragColor = textureCube(skybox, vTextureCoords);" +
+                " vec4 texture = textureCube(skybox, vTextureCoords);" +
+                "  gl_FragColor = texture * vec4(vLightColour, 1.0);" +
                 "}"
 
     // buffers used to render the skybox.
@@ -208,7 +210,7 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
     /**
      * draw function
      */
-    fun draw(vpMatrix: FloatArray) {
+    fun draw(vpMatrix: FloatArray, lightColour: Triple<Float, Float, Float>) {
         GLES20.glUseProgram(mProgram)
 
         GLES20.glGetAttribLocation(mProgram, "vPosition").also {
@@ -224,6 +226,10 @@ class SkyBox(front: Bitmap, back: Bitmap, left: Bitmap, right: Bitmap, top: Bitm
 
             GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
                 GLES20.glUniformMatrix4fv(matrixHandle, 1, false, vpMatrix, 0)
+            }
+
+            GLES20.glGetUniformLocation(mProgram, "vLightColour").also { lightColourHandle ->
+                GLES20.glUniform3fv(lightColourHandle, 1, floatArrayOf(lightColour.first, lightColour.second, lightColour.third), 0)
             }
 
             GLES20.glBindTexture(GLES20.GL_TEXTURE_CUBE_MAP, mTextureBuffer[0])

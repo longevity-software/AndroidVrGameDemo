@@ -15,7 +15,7 @@ class SunLight(modelLoader: ModelLoader) {
     private val COORDS_PER_VERTEX = 3
     private val BYTES_PER_FLOAT = 4
     private val BYTES_PER_SHORT = 2
-    private val mDefaultLightPosition = Triple(0.0f, -20.0f, 0.0f)
+    private val mDefaultLightPosition = Triple(0.0f, -100.0f, 0.0f)
 
     private val vertexStride: Int = COORDS_PER_VERTEX * BYTES_PER_FLOAT
 
@@ -104,6 +104,7 @@ class SunLight(modelLoader: ModelLoader) {
     private fun loadShader(type: Int, shaderCode: String): Int {
         return GLES20.glCreateShader(type).also{
                 shader ->
+
             GLES20.glShaderSource(shader, shaderCode)
             GLES20.glCompileShader(shader)
         }
@@ -112,7 +113,7 @@ class SunLight(modelLoader: ModelLoader) {
     /**
      * Function which updates the position and colour based on the time of day
      */
-    fun UpdateSunLight(percentThroughDay: Float) {
+    fun UpdateSunLight(percentThroughDay: Float, playerPos: Triple<Float, Float, Float>) {
 
         val sunAngle = (360.0f * percentThroughDay)
 
@@ -132,7 +133,7 @@ class SunLight(modelLoader: ModelLoader) {
         }
 
         // set the position
-        mSunPosition = Triple(sunPos[12], sunPos[13], sunPos[14])
+        mSunPosition = Triple((playerPos.first + sunPos[12]), (playerPos.second + sunPos[13]), (playerPos.third + sunPos[14]))
 
         val sunAngleInt = sunAngle.toInt()
 
@@ -142,20 +143,20 @@ class SunLight(modelLoader: ModelLoader) {
                 val interp = ((10 - (100 - sunAngleInt)).toFloat() / 10.0f)
                 interpolateRGBColour(midNightColour, duskOrDawnColour, interp)
             }
-            in 100..139 -> {
-                val interp = ((40 - (139 - sunAngleInt)).toFloat() / 40.0f)
+            in 100..119 -> {
+                val interp = ((20 - (119 - sunAngleInt)).toFloat() / 20.0f)
                 interpolateRGBColour(duskOrDawnColour, earlyLateDayColour, interp)
             }
-            in 140..179 -> {
-                val interp = ((40 - (179 - sunAngleInt)).toFloat() / 40.0f)
+            in 120..179 -> {
+                val interp = ((60 - (179 - sunAngleInt)).toFloat() / 60.0f)
                 interpolateRGBColour(earlyLateDayColour, midDayColour, interp)
             }
-            in 180..219 -> {
-                val interp = ((40 - (219 - sunAngleInt)).toFloat() / 40.0f)
+            in 180..239 -> {
+                val interp = ((60 - (239 - sunAngleInt)).toFloat() / 60.0f)
                 interpolateRGBColour(midDayColour, earlyLateDayColour, interp)
             }
-            in 220..259 -> {
-                val interp = ((40 - (259 - sunAngleInt)).toFloat() / 40.0f)
+            in 240..259 -> {
+                val interp = ((20 - (259 - sunAngleInt)).toFloat() / 20.0f)
                 interpolateRGBColour(earlyLateDayColour, duskOrDawnColour, interp)
             }
             in 260..269 -> {
@@ -224,13 +225,24 @@ class SunLight(modelLoader: ModelLoader) {
                 }
 
                 // generate the model matrix Note Currently this is only a translation
-                val translationMatrix = FloatArray(16)
-                Matrix.setIdentityM(translationMatrix, 0)   // ensure we are starting from identity
-                Matrix.translateM(translationMatrix, 0, mSunPosition.first, mSunPosition.second, mSunPosition.third)
+                val translationMatrix = FloatArray(16).also {
+                    Matrix.setIdentityM(it, 0)
+                    Matrix.translateM(it, 0, mSunPosition.first, mSunPosition.second, mSunPosition.third)
+                }
+
+                val scaleMatrix = FloatArray(16).also {
+                    Matrix.setIdentityM(it, 0)
+                    Matrix.scaleM(it, 0, 8.0f, 8.0f, 8.0f)
+                }
+
+                // scale and then translate
+                val modelMatrix = FloatArray(16).also {
+                    Matrix.multiplyMM(it, 0, translationMatrix, 0, scaleMatrix, 0)
+                }
 
                 // add the model matrix to the view projection matrix to create the model view projection matrix.
                 val mvpMatrix = FloatArray(16)
-                Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, translationMatrix, 0)
+                Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, modelMatrix, 0)
 
                 GLES20.glGetUniformLocation(mProgram, "uMVPMatrix").also { matrixHandle ->
                     GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mvpMatrix, 0)
