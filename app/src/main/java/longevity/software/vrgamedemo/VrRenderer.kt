@@ -148,10 +148,10 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
         mSunLight.initialise()
 
         // initialise the game objects which will be drawn
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.SHELTER_MODEL)))
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.SHELTER_MODEL)))
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.HOUSE_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.GRASS_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.TREE_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.WALL_MODEL)))
+        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.GRASS_MODEL)))
 
         // set the position of these objects.
         mGameObjectList[0].setPosition(10.0f, 0.0f, 10.0f)

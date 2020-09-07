@@ -14,6 +14,11 @@ class PlayerVision {
         0.0f, 0.0f, 1.0f,
         0.0f, 1.0f, 0.0f)
 
+    private var mHalfEyeDistance = 0.1f
+    private var mLookDistance = 100.0f
+
+    private var mLookStraightAhead = true
+
     /**
      * get a copy of the left Eye
      */
@@ -57,7 +62,7 @@ class PlayerVision {
             Matrix.setIdentityM(it, 0)
 
             // set it to look far into the distance
-            Matrix.translateM(it, 0, 0.0f, 0.0f, 100.0f)
+            Matrix.translateM(it, 0, 0.0f, 0.0f, -mLookDistance)
 
             // rotation to where the player is looking
             Matrix.multiplyMM(it, 0, lookAtRotationMatrix, 0, it, 0)
@@ -79,7 +84,7 @@ class PlayerVision {
             Matrix.setIdentityM(it, 0)
 
             // set the origin position
-            Matrix.translateM(it, 0, -1.0f, 0.0f, 0.0f)
+            Matrix.translateM(it, 0, -mHalfEyeDistance, 0.0f, 0.0f)
 
             // rotate to where the player is facing
             Matrix.multiplyMM(it, 0, lookAtRotationMatrix, 0, it, 0)
@@ -90,7 +95,7 @@ class PlayerVision {
             Matrix.setIdentityM(it, 0)
 
             // set the origin position
-            Matrix.translateM(it, 0, 1.0f, 0.0f, 0.0f)
+            Matrix.translateM(it, 0, mHalfEyeDistance, 0.0f, 0.0f)
 
             // rotate to where the player is facing
             Matrix.multiplyMM(it, 0, lookAtRotationMatrix, 0, it, 0)
@@ -109,16 +114,44 @@ class PlayerVision {
         )
 
         // set where the camera's are looking
-        mLeftEye.setLookDirection(
-            Vector3Float(lookAtDirectionMatrix.get(12),
-                lookAtDirectionMatrix.get(13),
-                lookAtDirectionMatrix.get(14))
-        )
-        mRightEye.setLookDirection(
-            Vector3Float(lookAtDirectionMatrix.get(12),
-                lookAtDirectionMatrix.get(13),
-                lookAtDirectionMatrix.get(14))
-        )
+        if (mLookStraightAhead) {
+            val lookPos = Vector3Float(
+                x + lookAtDirectionMatrix.get(12),
+                PLAYER_Y + lookAtDirectionMatrix.get(13),
+                z + lookAtDirectionMatrix.get(14)
+            )
+
+            mLeftEye.setLookDirection(
+                Vector3Float(
+                    lookPos.getX() - mLeftEye.getPositionX(),
+                    lookPos.getY() - mLeftEye.getPositionY(),
+                    lookPos.getZ() - mLeftEye.getPositionZ()
+                )
+            )
+            mRightEye.setLookDirection(
+                Vector3Float(
+                    lookPos.getX() - mRightEye.getPositionX(),
+                    lookPos.getY() - mRightEye.getPositionY(),
+                    lookPos.getZ() - mRightEye.getPositionZ()
+                )
+            )
+        }
+        else {
+            mLeftEye.setLookDirection(
+                Vector3Float(
+                    lookAtDirectionMatrix.get(12),
+                    lookAtDirectionMatrix.get(13),
+                    lookAtDirectionMatrix.get(14)
+                )
+            )
+            mRightEye.setLookDirection(
+                Vector3Float(
+                    lookAtDirectionMatrix.get(12),
+                    lookAtDirectionMatrix.get(13),
+                    lookAtDirectionMatrix.get(14)
+                )
+            )
+        }
 
         // and set their up direction
         mLeftEye.setUpDirection(
@@ -131,5 +164,31 @@ class PlayerVision {
                 lookUpDirectionMatrix.get(13),
                 lookUpDirectionMatrix.get(14))
         )
+    }
+
+    /**
+     * Function to decrease the eye distance
+     */
+    fun decreaseEyeDistance(sub: Float) {
+        mHalfEyeDistance -= sub
+
+        // cap it at 0
+        if (mHalfEyeDistance < 0.0f) {
+            mHalfEyeDistance = 0.0f
+        }
+    }
+
+    /**
+     * Function to increase the eye distance
+     */
+    fun increaseEyeDistance(add: Float) {
+        mHalfEyeDistance += add
+    }
+
+    /**
+     * Function to change where the two cameras are looking
+     */
+    fun toggleCameraLookAt() {
+        mLookStraightAhead = if (mLookStraightAhead) false else true
     }
 }

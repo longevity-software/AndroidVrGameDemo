@@ -53,4 +53,18 @@ class GameControlHub(lookControl: LookControlInterface,
     fun isActionButtonPressed(): Boolean {
         return mButtonControl.isActionButtonPressed()
     }
+
+    /**
+     * function to get whether the action button has been pressed
+     */
+    fun isR1ButtonPressed(): Boolean {
+        return mButtonControl.IsR1ButtonPressed()
+    }
+
+    /**
+     * function to get whether the action button has been pressed
+     */
+    fun isL1ButtonPressed(): Boolean {
+        return mButtonControl.IsL1ButtonPressed()
+    }
 }

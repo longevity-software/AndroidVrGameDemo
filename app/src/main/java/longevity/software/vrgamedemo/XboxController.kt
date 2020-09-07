@@ -30,7 +30,11 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     private var mYawAngle: Float
     private var mYawDelta: Float
     private var mRollAngle: Float   // there is no roll delta as the xbox controller doesn't change this value
+
+    // buttons
     private var mActionButtonPressed: Boolean
+    private var mR1ButtonPressed: Boolean
+    private var mL1ButtonPressed: Boolean
 
     /**
      * init function initialises the translation and rotation matrices to an identity matrix.
@@ -47,8 +51,10 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         mForwardBackDelta = 0.0f
         mLeftRightDelta = 0.0f
 
-        // action button is initially not pressed
+        // buttons are initially not pressed
         mActionButtonPressed = false
+        mR1ButtonPressed = false
+        mL1ButtonPressed = false
     }
 
     /**
@@ -159,6 +165,44 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     }
 
     /**
+     *  Overridden function from the ButtonControlInterface
+     *  returns the current state of the R1 button.
+     */
+    override fun IsR1ButtonPressed() : Boolean {
+
+        // lock while we use the R1 button pressed variable
+        mButtonLock.lock()
+
+        // take a copy of the R1 button state and then reset it.
+        val isPressed = mR1ButtonPressed
+        mR1ButtonPressed = false
+
+        // unlock
+        mButtonLock.unlock()
+
+        return isPressed
+    }
+
+    /**
+     *  Overridden function from the ButtonControlInterface
+     *  returns the current state of the L1 button.
+     */
+    override fun IsL1ButtonPressed() : Boolean {
+
+        // lock while we use the L1 button pressed variable
+        mButtonLock.lock()
+
+        // take a copy of the L1 button state and then reset it.
+        val isPressed = mL1ButtonPressed
+        mL1ButtonPressed = false
+
+        // unlock
+        mButtonLock.unlock()
+
+        return isPressed
+    }
+
+    /**
      * Function to be called from the main activity/view's onKeyDown function.
      */
     fun onKeyDown(keyCode: Int, event: KeyEvent?) : Boolean {
@@ -182,6 +226,21 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                             mActionButtonPressed = true
 
                             // unlock
+                            mButtonLock.unlock()
+                        }
+                        KeyEvent.KEYCODE_BUTTON_R1 -> {
+                            mButtonLock.lock()
+
+                            mR1ButtonPressed = true
+
+                            mButtonLock.unlock()
+                        }
+
+                        KeyEvent.KEYCODE_BUTTON_L1 -> {
+                            mButtonLock.lock()
+
+                            mL1ButtonPressed = true
+
                             mButtonLock.unlock()
                         }
                         else -> {
@@ -240,16 +299,16 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         // lock while the translation matrix is being updated
         mTranslationLock.lock()
 
-        // get the move delta
-        mForwardBackDelta = (leftZ / Z_TRANSLATION_SCALE)
-        mLeftRightDelta = (leftX / X_TRANSLATION_SCALE)
+        // get the move delta Note this is inverted
+        mForwardBackDelta = (-leftZ / Z_TRANSLATION_SCALE)
+        mLeftRightDelta = (-leftX / X_TRANSLATION_SCALE)
 
         mTranslationLock.unlock()
 
         // lock while the rotation deltas are being generated
         mRotationLock.lock()
 
-        mPitchDelta = ( rightZ * PITCH_STEP )
+        mPitchDelta = ( -rightZ * PITCH_STEP )
         mYawDelta = ( rightX * YAW_STEP )
 
         mRotationLock.unlock()

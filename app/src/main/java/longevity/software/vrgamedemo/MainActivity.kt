@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(mVrGlSurfaceView)
 
         // Initialise the game loop
-        mGameLoop = GameLoop(mVrGlSurfaceView, mPlayerControlHub, mPlayer, mSunLight)
+        mGameLoop = GameLoop(mVrGlSurfaceView, mPlayerControlHub, mPlayer, mSunLight, mPlayerVision)
     }
 
     /**
