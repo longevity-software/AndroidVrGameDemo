@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mSkyBox: SkyBox
     private lateinit var mModelLoader: ModelLoader
     private lateinit var mSunLight: SunLight
+    private lateinit var mTileMap: TileMap
 
     /**
      * function called when the Main activity is created.
@@ -62,9 +63,12 @@ class MainActivity : AppCompatActivity() {
         // initialise the sunlight
         mSunLight = SunLight(mModelLoader)
 
+        // initialise the tile map
+        mTileMap = TileMap(mModelLoader)
+
         // create local insance of the VrGlSurfaceView so we can set it
         // as the content view and we can pass it to the GameLoop
-        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision, mSkyBox, mModelLoader, mSunLight)
+        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision, mSkyBox, mSunLight, mTileMap)
 
         // set the content to our VrGlSurfaceView
         setContentView(mVrGlSurfaceView)

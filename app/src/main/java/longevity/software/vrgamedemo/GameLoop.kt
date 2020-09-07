@@ -2,7 +2,7 @@ package longevity.software.vrgamedemo
 
 class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, player: Player, sun: SunLight, vision: PlayerVision): Runnable {
 
-    private val MILLISECONDS_IN_A_DAY = 20000
+    private val MILLISECONDS_IN_A_DAY = 240000
 
     private var mRunning = false
 

@@ -22,7 +22,7 @@ class SunLight(modelLoader: ModelLoader) {
     private val midDayColour = Triple(1.0f, 1.0f, 1.0f)
     private val duskOrDawnColour = Triple(1.0f, 0.5f, 0.0f)
     private val earlyLateDayColour = Triple(1.0f, 1.0f, 0.0f)
-    private val midNightColour = Triple(0.0f, 0.0f, 0.0f)
+    private val midNightColour = Triple(0.3f, 0.3f, 0.3f)
 
     private val vertexShaderCode =
     // This matrix member variable provides a hook to manipulate

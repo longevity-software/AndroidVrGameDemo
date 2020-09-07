@@ -9,7 +9,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLight: SunLight) : GLSurfaceView.Renderer {
+class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: DrawableInterface) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mProjectionMatrix = FloatArray(16)
@@ -21,9 +21,6 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
     // Camera definitions.
     private var mRightCamera = vis.getRightEyeCamera()
     private var mLeftCamera = vis.getLeftEyeCamera()
-
-    // local copy of the context
-    private val mModelLoader = modelLoader
 
     // framebuffer constants
     private val TEXTURE_WIDTH: Int = 768
@@ -41,8 +38,8 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
     private lateinit var mTextureBufferLeft: IntBuffer
     private lateinit var mTextureBufferRight: IntBuffer
 
-    // Lists of the Game Objects in the scene
-    private val mGameObjectList = mutableListOf<AbstractGameObject>()
+    // local copy of the scene
+    private val mScene = scene
 
     // the skybox background
     private val mSkyBox = sky
@@ -147,17 +144,8 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
         // initialise the sunlight model
         mSunLight.initialise()
 
-        // initialise the game objects which will be drawn
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.GRASS_MODEL)))
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.TREE_MODEL)))
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.WALL_MODEL)))
-        mGameObjectList.add(GenericGameObject(mModelLoader.getModelData(mModelLoader.GRASS_MODEL)))
-
-        // set the position of these objects.
-        mGameObjectList[0].setPosition(10.0f, 0.0f, 10.0f)
-        mGameObjectList[1].setPosition(10.0f, 0.0f, -10.0f)
-        mGameObjectList[2].setPosition(-10.0f, 0.0f, 10.0f)
-        mGameObjectList[3].setPosition(-10.0f, 0.0f, -10.0f)
+        // initialise the scene
+        mScene.initialise()
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
@@ -268,14 +256,11 @@ class VrRenderer(modelLoader: ModelLoader, vis: PlayerVision, sky: SkyBox, sunLi
         // create a view projection matrix
         Matrix.multiplyMM(viewProjectionMatrix, 0, mProjectionMatrix, 0, viewMatrix, 0)
 
-        // draw all the game objects in the list.
-        for (gameObject in mGameObjectList) {
-            gameObject.draw(viewProjectionMatrix,
-                            mSunLight.getSunPosition(),       // light position
-                            mSunLight.getLightColour(),        // light colour
-                            Triple(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
+        mScene.draw(viewProjectionMatrix,
+            mSunLight.getSunPosition(),       // light position
+            mSunLight.getLightColour(),        // light colour
+            Triple(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
             )
-        }
 
         // render the sun
         // set the light position as the camera position so that the sun is illuminated.
