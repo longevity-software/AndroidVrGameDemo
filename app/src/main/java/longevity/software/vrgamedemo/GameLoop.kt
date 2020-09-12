@@ -1,6 +1,6 @@
 package longevity.software.vrgamedemo
 
-class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, player: Player, sun: SunLight, vision: PlayerVision): Runnable {
+class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, player: Player, sun: SunLight, vision: PlayerVision, tileMap: TileMap): Runnable {
 
     private val MILLISECONDS_IN_A_DAY = 240000
 
@@ -11,6 +11,7 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
     private var mPlayer = player
     private var mSunLight = sun
     private var mPlayerVision = vision
+    private var mTileMap = tileMap
 
     /**
      * overriden run function from the Runnable interface
@@ -24,7 +25,8 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
             mPlayer.adjustPlayer(mControlHub.getMoveForwardBackDelta(),
                                     mControlHub.getMoveLeftRightDelta(),
                                     mControlHub.getLookPitch(),
-                                    mControlHub.getLookYaw())
+                                    mControlHub.getLookYaw(),
+                                    mTileMap)
 
             if (mControlHub.isR1ButtonPressed()) {
                 mPlayerVision.increaseEyeDistance(0.1f)

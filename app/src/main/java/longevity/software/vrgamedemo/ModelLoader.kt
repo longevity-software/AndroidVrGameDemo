@@ -9,6 +9,16 @@ class ModelLoader(context: Context) {
     val TREE_MODEL = "Tree.obj"
     val WALL_MODEL = "Wall.obj"
 
+    val TILE_ONE_MODEL = "TileOne.obj"
+    val TILE_TWO_MODEL = "TileTwo.obj"
+    val TILE_THREE_MODEL = "TileThree.obj"
+    val TILE_FOUR_MODEL = "TileFour.obj"
+    val TILE_FIVE_MODEL = "TileFive.obj"
+    val TILE_SIX_MODEL = "TileSix.obj"
+    val TILE_SEVEN_MODEL = "TileSeven.obj"
+    val TILE_EIGHT_MODEL = "TileEight.obj"
+    val TILE_NINE_MODEL = "TileNine.obj"
+
     private val mModelMap = HashMap<String, ModelData>()
     private val mDefaultModel: ModelData
 
@@ -20,6 +30,16 @@ class ModelLoader(context: Context) {
         mModelMap.put(GRASS_MODEL, ObjectAndMaterialFileParser(context, GRASS_MODEL).getModelData())
         mModelMap.put(TREE_MODEL, ObjectAndMaterialFileParser(context, TREE_MODEL).getModelData())
         mModelMap.put(WALL_MODEL, ObjectAndMaterialFileParser(context, WALL_MODEL).getModelData())
+
+        mModelMap.put(TILE_ONE_MODEL, ObjectAndMaterialFileParser(context, TILE_ONE_MODEL).getModelData())
+        mModelMap.put(TILE_TWO_MODEL, ObjectAndMaterialFileParser(context, TILE_TWO_MODEL).getModelData())
+        mModelMap.put(TILE_THREE_MODEL, ObjectAndMaterialFileParser(context, TILE_THREE_MODEL).getModelData())
+        mModelMap.put(TILE_FOUR_MODEL, ObjectAndMaterialFileParser(context, TILE_FOUR_MODEL).getModelData())
+        mModelMap.put(TILE_FIVE_MODEL, ObjectAndMaterialFileParser(context, TILE_FIVE_MODEL).getModelData())
+        mModelMap.put(TILE_SIX_MODEL, ObjectAndMaterialFileParser(context, TILE_SIX_MODEL).getModelData())
+        mModelMap.put(TILE_SEVEN_MODEL, ObjectAndMaterialFileParser(context, TILE_SEVEN_MODEL).getModelData())
+        mModelMap.put(TILE_EIGHT_MODEL, ObjectAndMaterialFileParser(context, TILE_EIGHT_MODEL).getModelData())
+        mModelMap.put(TILE_NINE_MODEL, ObjectAndMaterialFileParser(context, TILE_NINE_MODEL).getModelData())
     }
 
     /**

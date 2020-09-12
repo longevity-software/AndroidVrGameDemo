@@ -16,7 +16,8 @@ class Player(originX: Float, originY: Float, originZ: Float, vis: PlayerVision) 
     fun adjustPlayer(forwardBackDelta: Float,
                      leftRightDelta: Float,
                      headPitch: Float,
-                     headYaw: Float) {
+                     headYaw: Float,
+                     tileMap: TileMap) {
 
         // we need to take into account which direction we are facing so
         // generate a rotation matrix using the yaw angle
@@ -37,9 +38,26 @@ class Player(originX: Float, originY: Float, originZ: Float, vis: PlayerVision) 
         }
 
         // extract and adjust the player position by the x, y and z components
-        mPlayerX += translationMatrix.get(12)
-        mPlayerY += translationMatrix.get(13)
-        mPlayerZ += translationMatrix.get(14)
+        //mPlayerX += translationMatrix.get(12)
+        //mPlayerY += translationMatrix.get(13)
+        //mPlayerZ += translationMatrix.get(14)
+
+        val newPosition = tileMap.getPlayerPositionOnTileMap(
+            Triple(                         // current
+                mPlayerX,
+                mPlayerY,
+                mPlayerZ
+            ),
+            Triple(                         // detla
+                translationMatrix.get(12),
+                translationMatrix.get(13),
+                translationMatrix.get(14)
+            )
+        )
+
+        mPlayerX = newPosition.first
+        mPlayerY = newPosition.second
+        mPlayerZ = newPosition.third
 
         // update what the player can see.
         mPlayerVision.setVision(headPitch, headYaw, mPlayerX, mPlayerZ)
