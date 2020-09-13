@@ -1,6 +1,6 @@
 package longevity.software.vrgamedemo
 
-class TileMap(modelLoader: ModelLoader) : DrawableInterface {
+class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileMapInterface {
 
     private val NUMBER_OF_TILES = 9
 
@@ -55,7 +55,7 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface {
     /**
      * Function to get the players position on the tile map
      */
-    fun getPlayerPositionOnTileMap(current : Triple<Float, Float, Float>, delta : Triple<Float, Float, Float>) : Triple<Float, Float, Float> {
+    override fun getPlayerPositionOnTileMap(current : Triple<Float, Float, Float>, delta : Triple<Float, Float, Float>) : Triple<Float, Float, Float> {
 
         var tempX = (current.first + delta.first)
         var tempY = (current.second + delta.second)

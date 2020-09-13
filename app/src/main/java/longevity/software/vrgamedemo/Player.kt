@@ -17,7 +17,7 @@ class Player(originX: Float, originY: Float, originZ: Float, vis: PlayerVision) 
                      leftRightDelta: Float,
                      headPitch: Float,
                      headYaw: Float,
-                     tileMap: TileMap) {
+                     tileMap: PlayerPositionTileMapInterface) {
 
         // we need to take into account which direction we are facing so
         // generate a rotation matrix using the yaw angle
