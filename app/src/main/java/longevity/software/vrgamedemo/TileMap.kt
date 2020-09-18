@@ -57,20 +57,210 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileM
      */
     override fun getPlayerPositionOnTileMap(current : Triple<Float, Float, Float>, delta : Triple<Float, Float, Float>) : Triple<Float, Float, Float> {
 
+        val DONT_MOVE = 0x00
+        val MOVE_UP = 0x01
+        val MOVE_DOWN = 0x02
+        val MOVE_LEFT = 0x04
+        val MOVE_RIGHT = 0x08
+
+        // diaganols
+        val MOVE_UP_AND_RIGHT = MOVE_UP or MOVE_RIGHT
+        val MOVE_UP_AND_LEFT = MOVE_UP or MOVE_LEFT
+        val MOVE_DOWN_AND_RIGHT = MOVE_DOWN or MOVE_RIGHT
+        val MOVE_DOWN_AND_LEFT = MOVE_DOWN or MOVE_LEFT
+
         var tempX = (current.first + delta.first)
         var tempY = (current.second + delta.second)
         var tempZ = (current.third + delta.third)
 
+        var moveDirection = DONT_MOVE
+
         if ( tempX > HALF_TILE_SIZE ) {
             tempX -= TILE_SIZE
+            moveDirection = moveDirection or MOVE_RIGHT
         } else if ( tempX < -HALF_TILE_SIZE ) {
             tempX += TILE_SIZE
+            moveDirection = moveDirection or MOVE_LEFT
         }
 
         if ( tempZ > HALF_TILE_SIZE ) {
             tempZ -= TILE_SIZE
+            moveDirection = moveDirection or MOVE_DOWN
         } else if ( tempZ < -HALF_TILE_SIZE ) {
             tempZ += TILE_SIZE
+            moveDirection = moveDirection or MOVE_UP
+        }
+
+        when (moveDirection) {
+            MOVE_UP -> {
+                // move the first column up
+                var tempTile = mTiles[6]
+                mTiles[6] = mTiles[3]
+                mTiles[3] = mTiles[0]
+                mTiles[0] = tempTile
+
+                // and the middle column
+                tempTile = mTiles[7]
+                mTiles[7] = mTiles[4]
+                mTiles[4] = mTiles[1]
+                mTiles[1] = tempTile
+
+                // and finally the last column
+                tempTile = mTiles[8]
+                mTiles[8] = mTiles[5]
+                mTiles[5] = mTiles[2]
+                mTiles[2] = tempTile
+            }
+            MOVE_DOWN -> {
+                // move the first column down
+                var tempTile = mTiles[0]
+                mTiles[0] = mTiles[3]
+                mTiles[3] = mTiles[6]
+                mTiles[6] = tempTile
+
+                // and the middle column
+                tempTile = mTiles[1]
+                mTiles[1] = mTiles[4]
+                mTiles[4] = mTiles[7]
+                mTiles[7] = tempTile
+
+                // and finally the last column
+                tempTile = mTiles[2]
+                mTiles[2] = mTiles[5]
+                mTiles[5] = mTiles[8]
+                mTiles[8] = tempTile
+            }
+            MOVE_LEFT -> {
+
+                // move the first row right
+                var tempTile = mTiles[2]
+                mTiles[2] = mTiles[1]
+                mTiles[1] = mTiles[0]
+                mTiles[0] = tempTile
+
+                // and the middle column
+                tempTile = mTiles[5]
+                mTiles[5] = mTiles[4]
+                mTiles[4] = mTiles[3]
+                mTiles[3] = tempTile
+
+                // and finally the last column
+                tempTile = mTiles[8]
+                mTiles[8] = mTiles[7]
+                mTiles[7] = mTiles[6]
+                mTiles[6] = tempTile
+            }
+            MOVE_RIGHT -> {
+
+                // move the first row left
+                var tempTile = mTiles[0]
+                mTiles[0] = mTiles[1]
+                mTiles[1] = mTiles[2]
+                mTiles[2] = tempTile
+
+                // and the middle row left
+                tempTile = mTiles[3]
+                mTiles[3] = mTiles[4]
+                mTiles[4] = mTiles[5]
+                mTiles[5] = tempTile
+
+                // and finally the last row
+                tempTile = mTiles[6]
+                mTiles[6] = mTiles[7]
+                mTiles[7] = mTiles[8]
+                mTiles[8] = tempTile
+            }
+            MOVE_UP_AND_RIGHT -> {
+                // move the diagonal
+                var tempTile = mTiles[3]
+                mTiles[3] = mTiles[1]
+                mTiles[1] = tempTile
+
+                // and the middle diaganol
+                tempTile = mTiles[6]
+                mTiles[6] = mTiles[4]
+                mTiles[4] = mTiles[2]
+                mTiles[2] = tempTile
+
+                // and finally the last diagonal
+                tempTile = mTiles[7]
+                mTiles[7] = mTiles[5]
+                mTiles[5] = tempTile
+            }
+            MOVE_UP_AND_LEFT -> {
+                // move the diagonal
+                var tempTile = mTiles[3]
+                mTiles[3] = mTiles[7]
+                mTiles[7] = tempTile
+
+                // and the middle diaganol
+                tempTile = mTiles[8]
+                mTiles[8] = mTiles[4]
+                mTiles[4] = mTiles[0]
+                mTiles[0] = tempTile
+
+                // and finally the last diagonal
+                tempTile = mTiles[5]
+                mTiles[5] = mTiles[1]
+                mTiles[1] = tempTile
+            }
+            MOVE_DOWN_AND_RIGHT -> {
+                // move the diagonal
+                var tempTile = mTiles[7]
+                mTiles[7] = mTiles[3]
+                mTiles[3] = tempTile
+
+                // and the middle diaganol
+                tempTile = mTiles[0]
+                mTiles[0] = mTiles[4]
+                mTiles[4] = mTiles[8]
+                mTiles[8] = tempTile
+
+                // and finally the last diagonal
+                tempTile = mTiles[1]
+                mTiles[1] = mTiles[5]
+                mTiles[5] = tempTile
+            }
+            MOVE_DOWN_AND_LEFT -> {
+                // move the diagonal
+                var tempTile = mTiles[1]
+                mTiles[1] = mTiles[3]
+                mTiles[3] = tempTile
+
+                // and the middle diaganol
+                tempTile = mTiles[2]
+                mTiles[2] = mTiles[4]
+                mTiles[4] = mTiles[6]
+                mTiles[6] = tempTile
+
+                // and finally the last diagonal
+                tempTile = mTiles[5]
+                mTiles[5] = mTiles[7]
+                mTiles[7] = tempTile
+            }
+            else -> {
+                // do nothing if the direction is not valid
+            }
+        }
+
+        // if the tiles have moved then reset the offsets
+        if ( DONT_MOVE != moveDirection ) {
+            val offsets = arrayOf(
+                Pair(-TILE_SIZE, -TILE_SIZE),
+                Pair(0.0f, -TILE_SIZE),
+                Pair(TILE_SIZE, -TILE_SIZE),
+                Pair(-TILE_SIZE, 0.0f),
+                Pair(0.0f, 0.0f),
+                Pair(TILE_SIZE, 0.0f),
+                Pair(-TILE_SIZE, TILE_SIZE),
+                Pair(0.0f, TILE_SIZE),
+                Pair(TILE_SIZE, TILE_SIZE)
+            )
+
+            // add all the models to the arraylist of model data
+            for (i in 0 until NUMBER_OF_TILES) {
+                mTiles[i]?.setTileOffset(offsets[i].first, offsets[i].second)
+            }
         }
 
         return Triple(tempX, tempY, tempZ)
