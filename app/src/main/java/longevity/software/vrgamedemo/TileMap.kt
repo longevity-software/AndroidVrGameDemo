@@ -9,6 +9,8 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileM
 
     private var mTiles = Array<Tile?>(9) {null}
 
+    private val mModelLoader = modelLoader
+
     /**
      * Initialise the tiles to default ones for now
      */
@@ -94,149 +96,125 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileM
         when (moveDirection) {
             MOVE_UP -> {
                 // move the first column up
-                var tempTile = mTiles[6]
                 mTiles[6] = mTiles[3]
                 mTiles[3] = mTiles[0]
-                mTiles[0] = tempTile
+                mTiles[0] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle column
-                tempTile = mTiles[7]
                 mTiles[7] = mTiles[4]
                 mTiles[4] = mTiles[1]
-                mTiles[1] = tempTile
+                mTiles[1] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last column
-                tempTile = mTiles[8]
                 mTiles[8] = mTiles[5]
                 mTiles[5] = mTiles[2]
-                mTiles[2] = tempTile
+                mTiles[2] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_DOWN -> {
                 // move the first column down
-                var tempTile = mTiles[0]
                 mTiles[0] = mTiles[3]
                 mTiles[3] = mTiles[6]
-                mTiles[6] = tempTile
+                mTiles[6] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle column
-                tempTile = mTiles[1]
                 mTiles[1] = mTiles[4]
                 mTiles[4] = mTiles[7]
-                mTiles[7] = tempTile
+                mTiles[7] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last column
-                tempTile = mTiles[2]
                 mTiles[2] = mTiles[5]
                 mTiles[5] = mTiles[8]
-                mTiles[8] = tempTile
+                mTiles[8] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_LEFT -> {
 
                 // move the first row right
-                var tempTile = mTiles[2]
                 mTiles[2] = mTiles[1]
                 mTiles[1] = mTiles[0]
-                mTiles[0] = tempTile
+                mTiles[0] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle column
-                tempTile = mTiles[5]
                 mTiles[5] = mTiles[4]
                 mTiles[4] = mTiles[3]
-                mTiles[3] = tempTile
+                mTiles[3] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last column
-                tempTile = mTiles[8]
                 mTiles[8] = mTiles[7]
                 mTiles[7] = mTiles[6]
-                mTiles[6] = tempTile
+                mTiles[6] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_RIGHT -> {
 
                 // move the first row left
-                var tempTile = mTiles[0]
                 mTiles[0] = mTiles[1]
                 mTiles[1] = mTiles[2]
-                mTiles[2] = tempTile
+                mTiles[2] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle row left
-                tempTile = mTiles[3]
                 mTiles[3] = mTiles[4]
                 mTiles[4] = mTiles[5]
-                mTiles[5] = tempTile
+                mTiles[5] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last row
-                tempTile = mTiles[6]
                 mTiles[6] = mTiles[7]
                 mTiles[7] = mTiles[8]
-                mTiles[8] = tempTile
+                mTiles[8] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_UP_AND_RIGHT -> {
                 // move the diagonal
-                var tempTile = mTiles[3]
                 mTiles[3] = mTiles[1]
-                mTiles[1] = tempTile
+                mTiles[1] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle diaganol
-                tempTile = mTiles[6]
                 mTiles[6] = mTiles[4]
                 mTiles[4] = mTiles[2]
-                mTiles[2] = tempTile
+                mTiles[2] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last diagonal
-                tempTile = mTiles[7]
                 mTiles[7] = mTiles[5]
-                mTiles[5] = tempTile
+                mTiles[5] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_UP_AND_LEFT -> {
                 // move the diagonal
-                var tempTile = mTiles[3]
                 mTiles[3] = mTiles[7]
-                mTiles[7] = tempTile
+                mTiles[7] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle diaganol
-                tempTile = mTiles[8]
                 mTiles[8] = mTiles[4]
                 mTiles[4] = mTiles[0]
-                mTiles[0] = tempTile
+                mTiles[0] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last diagonal
-                tempTile = mTiles[5]
                 mTiles[5] = mTiles[1]
-                mTiles[1] = tempTile
+                mTiles[1] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_DOWN_AND_RIGHT -> {
                 // move the diagonal
-                var tempTile = mTiles[7]
                 mTiles[7] = mTiles[3]
-                mTiles[3] = tempTile
+                mTiles[3] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle diaganol
-                tempTile = mTiles[0]
                 mTiles[0] = mTiles[4]
                 mTiles[4] = mTiles[8]
-                mTiles[8] = tempTile
+                mTiles[8] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last diagonal
-                tempTile = mTiles[1]
                 mTiles[1] = mTiles[5]
-                mTiles[5] = tempTile
+                mTiles[5] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             MOVE_DOWN_AND_LEFT -> {
                 // move the diagonal
-                var tempTile = mTiles[1]
                 mTiles[1] = mTiles[3]
-                mTiles[3] = tempTile
+                mTiles[3] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and the middle diaganol
-                tempTile = mTiles[2]
                 mTiles[2] = mTiles[4]
                 mTiles[4] = mTiles[6]
-                mTiles[6] = tempTile
+                mTiles[6] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
 
                 // and finally the last diagonal
-                tempTile = mTiles[5]
                 mTiles[5] = mTiles[7]
-                mTiles[7] = tempTile
+                mTiles[7] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
             }
             else -> {
                 // do nothing if the direction is not valid

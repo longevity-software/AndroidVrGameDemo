@@ -13,8 +13,8 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     private val mButtonLock = ReentrantLock()
 
     // constants for translation scaling
-    private val X_TRANSLATION_SCALE = -30.0f
-    private val Z_TRANSLATION_SCALE = -30.0f
+    private val X_TRANSLATION_SCALE = -20.0f
+    private val Z_TRANSLATION_SCALE = -20.0f
 
     // constants for the look rotation
     private val MAX_PITCH_ANGLE = 90.0f

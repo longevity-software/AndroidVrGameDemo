@@ -1,6 +1,7 @@
 package longevity.software.vrgamedemo
 
 import android.content.Context
+import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 
 class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox, sun: SunLight, scene: DrawableInterface) : GLSurfaceView(context){
@@ -29,5 +30,8 @@ class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox, sun: Sun
     fun reRenderTheScene()
     {
         this.requestRender()
+
+        // and wait for the rendering to finish
+        GLES20.glFinish()
     }
 }
