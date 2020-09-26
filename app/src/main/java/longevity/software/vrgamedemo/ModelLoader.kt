@@ -19,6 +19,8 @@ class ModelLoader(context: Context) {
     val TILE_EIGHT_MODEL = "TileEight.obj"
     val TILE_NINE_MODEL = "TileNine.obj"
 
+    val TILE_EMPTY = "emptyTile.obj"
+
     private val mModelMap = HashMap<String, ModelData>()
     private val mDefaultModel: ModelData
 
@@ -40,6 +42,7 @@ class ModelLoader(context: Context) {
         mModelMap.put(TILE_SEVEN_MODEL, ObjectAndMaterialFileParser(context, TILE_SEVEN_MODEL).getModelData())
         mModelMap.put(TILE_EIGHT_MODEL, ObjectAndMaterialFileParser(context, TILE_EIGHT_MODEL).getModelData())
         mModelMap.put(TILE_NINE_MODEL, ObjectAndMaterialFileParser(context, TILE_NINE_MODEL).getModelData())
+        mModelMap.put(TILE_EMPTY, ObjectAndMaterialFileParser(context, TILE_EMPTY).getModelData())
     }
 
     /**

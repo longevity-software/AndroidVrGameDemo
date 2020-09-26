@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         mSunLight = SunLight(mModelLoader)
 
         // initialise the tile map
-        mTileMap = TileMap(mModelLoader)
+        mTileMap = TileMap(this, mModelLoader)
 
         // create local insance of the VrGlSurfaceView so we can set it
         // as the content view and we can pass it to the GameLoop

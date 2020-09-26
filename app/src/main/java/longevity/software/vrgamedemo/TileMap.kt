@@ -1,6 +1,8 @@
 package longevity.software.vrgamedemo
 
-class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileMapInterface {
+import android.content.Context
+
+class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileMapInterface {
 
     private val NUMBER_OF_TILES = 9
 
@@ -11,25 +13,26 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileM
 
     private val mModelLoader = modelLoader
 
+    private val mContext = context
+
     /**
      * Initialise the tiles to default ones for now
      */
     init {
 
-        val models = arrayOf<String>(modelLoader.TILE_ONE_MODEL,
-            modelLoader.TILE_TWO_MODEL,
-            modelLoader.TILE_THREE_MODEL,
-            modelLoader.TILE_FOUR_MODEL,
-            modelLoader.TILE_FIVE_MODEL,
-            modelLoader.TILE_SIX_MODEL,
-            modelLoader.TILE_SEVEN_MODEL,
-            modelLoader.TILE_EIGHT_MODEL,
-            modelLoader.TILE_NINE_MODEL)
+        // set the center tile
+        mTiles[4] = VrTileFormatParser(mContext, "Tile_0_0.vtf", modelLoader).getParsedTile()
 
-        // Create all the tiles
-        for (i in 0 until NUMBER_OF_TILES) {
-            mTiles[i] = Tile(models[i], modelLoader)
-        }
+        // set the other tiles
+        mTiles[0] = VrTileFormatParser(mContext, mTiles[4]!!.TileUpAndLeft, modelLoader).getParsedTile()
+        mTiles[1] = VrTileFormatParser(mContext, mTiles[4]!!.TileStraightUp, modelLoader).getParsedTile()
+        mTiles[2] = VrTileFormatParser(mContext, mTiles[4]!!.TileUpAndRight, modelLoader).getParsedTile()
+        mTiles[3] = VrTileFormatParser(mContext, mTiles[4]!!.TileLeft, modelLoader).getParsedTile()
+        mTiles[5] = VrTileFormatParser(mContext, mTiles[4]!!.TileRight, modelLoader).getParsedTile()
+        mTiles[6] = VrTileFormatParser(mContext, mTiles[4]!!.TileDownAndLeft, modelLoader).getParsedTile()
+        mTiles[7] = VrTileFormatParser(mContext, mTiles[4]!!.TileStraightDown, modelLoader).getParsedTile()
+        mTiles[8] = VrTileFormatParser(mContext, mTiles[4]!!.TileDownAndRight, modelLoader).getParsedTile()
+
     }
 
     /**
@@ -98,123 +101,143 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileM
                 // move the first column up
                 mTiles[6] = mTiles[3]
                 mTiles[3] = mTiles[0]
-                mTiles[0] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[0] = VrTileFormatParser(mContext, mTiles[3]!!.TileStraightUp, mModelLoader).getParsedTile()
 
                 // and the middle column
                 mTiles[7] = mTiles[4]
                 mTiles[4] = mTiles[1]
-                mTiles[1] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[1] = VrTileFormatParser(mContext, mTiles[4]!!.TileStraightUp, mModelLoader).getParsedTile()
 
                 // and finally the last column
                 mTiles[8] = mTiles[5]
                 mTiles[5] = mTiles[2]
-                mTiles[2] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[2] = VrTileFormatParser(mContext, mTiles[5]!!.TileStraightUp, mModelLoader).getParsedTile()
             }
             MOVE_DOWN -> {
                 // move the first column down
                 mTiles[0] = mTiles[3]
                 mTiles[3] = mTiles[6]
-                mTiles[6] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[6] = VrTileFormatParser(mContext, mTiles[3]!!.TileStraightDown, mModelLoader).getParsedTile()
 
                 // and the middle column
                 mTiles[1] = mTiles[4]
                 mTiles[4] = mTiles[7]
-                mTiles[7] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[7] = VrTileFormatParser(mContext, mTiles[4]!!.TileStraightDown, mModelLoader).getParsedTile()
 
                 // and finally the last column
                 mTiles[2] = mTiles[5]
                 mTiles[5] = mTiles[8]
-                mTiles[8] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[8] = VrTileFormatParser(mContext, mTiles[5]!!.TileStraightDown, mModelLoader).getParsedTile()
             }
             MOVE_LEFT -> {
 
                 // move the first row right
                 mTiles[2] = mTiles[1]
                 mTiles[1] = mTiles[0]
-                mTiles[0] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[0] = VrTileFormatParser(mContext, mTiles[1]!!.TileLeft, mModelLoader).getParsedTile()
 
                 // and the middle column
                 mTiles[5] = mTiles[4]
                 mTiles[4] = mTiles[3]
-                mTiles[3] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[3] = VrTileFormatParser(mContext, mTiles[4]!!.TileLeft, mModelLoader).getParsedTile()
 
                 // and finally the last column
                 mTiles[8] = mTiles[7]
                 mTiles[7] = mTiles[6]
-                mTiles[6] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[6] = VrTileFormatParser(mContext, mTiles[7]!!.TileLeft, mModelLoader).getParsedTile()
             }
             MOVE_RIGHT -> {
 
                 // move the first row left
                 mTiles[0] = mTiles[1]
                 mTiles[1] = mTiles[2]
-                mTiles[2] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[2] = VrTileFormatParser(mContext, mTiles[1]!!.TileRight, mModelLoader).getParsedTile()
 
                 // and the middle row left
                 mTiles[3] = mTiles[4]
                 mTiles[4] = mTiles[5]
-                mTiles[5] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[5] = VrTileFormatParser(mContext, mTiles[4]!!.TileRight, mModelLoader).getParsedTile()
 
                 // and finally the last row
                 mTiles[6] = mTiles[7]
                 mTiles[7] = mTiles[8]
-                mTiles[8] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[8] = VrTileFormatParser(mContext, mTiles[7]!!.TileRight, mModelLoader).getParsedTile()
             }
             MOVE_UP_AND_RIGHT -> {
+
+                mTiles[0] = VrTileFormatParser(mContext, mTiles[0]!!.TileUpAndRight, mModelLoader).getParsedTile()
+
                 // move the diagonal
                 mTiles[3] = mTiles[1]
-                mTiles[1] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[1] = VrTileFormatParser(mContext, mTiles[3]!!.TileUpAndRight, mModelLoader).getParsedTile()
 
                 // and the middle diaganol
                 mTiles[6] = mTiles[4]
                 mTiles[4] = mTiles[2]
-                mTiles[2] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[2] = VrTileFormatParser(mContext, mTiles[4]!!.TileUpAndRight, mModelLoader).getParsedTile()
 
                 // and finally the last diagonal
                 mTiles[7] = mTiles[5]
-                mTiles[5] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[5] = VrTileFormatParser(mContext, mTiles[7]!!.TileUpAndRight, mModelLoader).getParsedTile()
+
+                mTiles[8] = VrTileFormatParser(mContext, mTiles[8]!!.TileUpAndRight, mModelLoader).getParsedTile()
             }
             MOVE_UP_AND_LEFT -> {
+
+                mTiles[2] = VrTileFormatParser(mContext, mTiles[2]!!.TileUpAndLeft, mModelLoader).getParsedTile()
+
                 // move the diagonal
                 mTiles[3] = mTiles[7]
-                mTiles[7] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[7] = VrTileFormatParser(mContext, mTiles[3]!!.TileUpAndLeft, mModelLoader).getParsedTile()
 
                 // and the middle diaganol
                 mTiles[8] = mTiles[4]
                 mTiles[4] = mTiles[0]
-                mTiles[0] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[0] = VrTileFormatParser(mContext, mTiles[4]!!.TileUpAndLeft, mModelLoader).getParsedTile()
 
                 // and finally the last diagonal
                 mTiles[5] = mTiles[1]
-                mTiles[1] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[1] = VrTileFormatParser(mContext, mTiles[5]!!.TileUpAndLeft, mModelLoader).getParsedTile()
+
+                mTiles [6] = VrTileFormatParser(mContext, mTiles[6]!!.TileUpAndLeft, mModelLoader).getParsedTile()
             }
             MOVE_DOWN_AND_RIGHT -> {
+
+                mTiles[2] = VrTileFormatParser(mContext, mTiles[2]!!.TileDownAndRight, mModelLoader).getParsedTile()
+
                 // move the diagonal
                 mTiles[7] = mTiles[3]
-                mTiles[3] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[3] = VrTileFormatParser(mContext, mTiles[7]!!.TileDownAndRight, mModelLoader).getParsedTile()
 
                 // and the middle diaganol
                 mTiles[0] = mTiles[4]
                 mTiles[4] = mTiles[8]
-                mTiles[8] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[8] = VrTileFormatParser(mContext, mTiles[4]!!.TileDownAndRight, mModelLoader).getParsedTile()
 
                 // and finally the last diagonal
                 mTiles[1] = mTiles[5]
-                mTiles[5] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[5] = VrTileFormatParser(mContext, mTiles[1]!!.TileDownAndRight, mModelLoader).getParsedTile()
+
+                mTiles[6] = VrTileFormatParser(mContext, mTiles[6]!!.TileDownAndRight, mModelLoader).getParsedTile()
             }
             MOVE_DOWN_AND_LEFT -> {
+
+                mTiles[0] = VrTileFormatParser(mContext, mTiles[0]!!.TileDownAndLeft, mModelLoader).getParsedTile()
+
                 // move the diagonal
                 mTiles[1] = mTiles[3]
-                mTiles[3] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[3] = VrTileFormatParser(mContext, mTiles[1]!!.TileDownAndLeft, mModelLoader).getParsedTile()
 
                 // and the middle diaganol
                 mTiles[2] = mTiles[4]
                 mTiles[4] = mTiles[6]
-                mTiles[6] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[6] = VrTileFormatParser(mContext, mTiles[4]!!.TileDownAndLeft, mModelLoader).getParsedTile()
 
                 // and finally the last diagonal
                 mTiles[5] = mTiles[7]
-                mTiles[7] = Tile(mModelLoader.GRASS_MODEL, mModelLoader)
+                mTiles[7] = VrTileFormatParser(mContext, mTiles[5]!!.TileDownAndLeft, mModelLoader).getParsedTile()
+
+                mTiles[8] = VrTileFormatParser(mContext, mTiles[8]!!.TileDownAndLeft, mModelLoader).getParsedTile()
             }
             else -> {
                 // do nothing if the direction is not valid
@@ -235,7 +258,7 @@ class TileMap(modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileM
                 Pair(TILE_SIZE, TILE_SIZE)
             )
 
-            // add all the models to the arraylist of model data
+            // tiles have shifted so reset the offsets
             for (i in 0 until NUMBER_OF_TILES) {
                 mTiles[i]?.setTileOffset(offsets[i].first, offsets[i].second)
             }
