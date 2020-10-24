@@ -2,6 +2,7 @@ package longevity.software.vrgamedemo
 
 class Tile(baseModel: String,
            modelLoader: ModelLoader,
+           tileName: String,
            upLeft: String,
            straightUp: String,
            upRight: String,
@@ -9,33 +10,45 @@ class Tile(baseModel: String,
            right: String,
            downLeft: String,
            straightDown: String,
-           downRight: String) : DrawableInterface {
+           downRight: String,
+           fluidity: Float) : DrawableInterface {
 
-    // set the base model to a blank tile if it is not set
-    private val mBaseModel = if ("" == baseModel) { modelLoader.TILE_EMPTY } else { baseModel }
+    private val mEMPTY_TILE_STRING = "Empty_tile.vtf"
+
+    private var mBaseModel = baseModel
 
     private var mStaticModels = ArrayList<AbstractGameObject>()
 
     private val mModelLoader = modelLoader
+
+    private val mFluidity = if (null == fluidity) { 0.0f } else fluidity
 
     private var mModelsHaveNotBeenInitialised = true
 
     private var mXOffset = 0.0f
     private var mZOffset = 0.0f
 
-    val TileUpAndLeft = if (null == upLeft) { "" } else { upLeft }
-    val TileStraightUp = if (null == straightUp) { "" } else { straightUp }
-    val TileUpAndRight = if (null == upRight) { "" } else { upRight }
-    val TileLeft = if (null == left) { "" } else { left }
-    val TileRight = if (null == right) { "" } else { right }
-    val TileDownAndLeft = if (null == downLeft) { "" } else { downLeft }
-    val TileStraightDown = if (null == straightDown) { "" } else { straightDown }
-    val TileDownAndRight = if (null == downRight) { "" } else { downRight }
+    private val mTileName = tileName
+    private val mTileUpAndLeft = upLeft
+    private val mTileStraightUp = straightUp
+    private val mTileUpAndRight = upRight
+    private val mTileStraightLeft = left
+    private val mTileStraightRight = right
+    private val mTileDownAndLeft = downLeft
+    private val mTileStraightDown = straightDown
+    private val mTileDownAndRight = downRight
 
     /**
      * Function to initialise the static models
      */
     override fun initialise() {
+
+        // confirm base model is sensible
+        if (    ( null == mBaseModel )
+                or ( "" == mBaseModel )
+        ) {
+            mBaseModel = mModelLoader.TILE_EMPTY
+        }
 
         mStaticModels.add(GenericGameObject(mModelLoader.getModelData(mBaseModel)))
 
@@ -74,13 +87,166 @@ class Tile(baseModel: String,
 
             val prevPos = model.getPosition()
 
-            model.setPosition((prevPos.first - mXOffset + xOff),
-                                prevPos.second,
-                                (prevPos.third - mZOffset + zOff))
+            model.setPosition((prevPos.X() - mXOffset + xOff),
+                                prevPos.Y(),
+                                (prevPos.Z() - mZOffset + zOff))
         }
 
         // then update the current offsets
         mXOffset = xOff
         mZOffset = zOff
+    }
+
+    /**
+     *  returns a null checked string representing the tile Name
+     */
+    fun getTileName() : String {
+
+        if (    ( null == mTileName )
+            or ( "" == mTileName )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileName
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile straight up from this one
+     */
+    fun getTileStraightUp() : String {
+
+        if (    ( null == mTileStraightUp )
+            or ( "" == mTileStraightUp )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileStraightUp
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile straight down from this one
+     */
+    fun getTileStraightDown() : String {
+
+        if (    ( null == mTileStraightDown )
+            or ( "" == mTileStraightDown )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileStraightDown
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile straight left from this one
+     */
+    fun getTileStraightLeft() : String {
+
+        if (    ( null == mTileStraightLeft )
+            or ( "" == mTileStraightLeft )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileStraightLeft
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile straight right from this one
+     */
+    fun getTileStraightRight() : String {
+
+        if (    ( null == mTileStraightRight )
+            or ( "" == mTileStraightRight )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileStraightRight
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile up and left from this one
+     */
+    fun getTileUpLeft() : String {
+
+        if (    ( null == mTileUpAndLeft )
+            or ( "" == mTileUpAndLeft )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileUpAndLeft
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile up and right from this one
+     */
+    fun getTileUpRight() : String {
+
+        if (    ( null == mTileUpAndRight )
+            or ( "" == mTileUpAndRight )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileUpAndRight
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile down and left from this one
+     */
+    fun getTileDownLeft() : String {
+
+        if (    ( null == mTileDownAndLeft )
+            or ( "" == mTileDownAndLeft )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileDownAndLeft
+        }
+    }
+
+    /**
+     *  returns a null checked string representing the tile down and right from this one
+     */
+    fun getTileDownRight() : String {
+
+        if (    ( null == mTileDownAndRight )
+            or ( "" == mTileDownAndRight )
+        ) {
+            return mEMPTY_TILE_STRING
+        }
+        else
+        {
+            return mTileDownAndRight
+        }
+    }
+
+    /**
+     *  Function to indicate how easily the player can move through the tile.
+     *  Fluidity should be a value between 0.0 (player can't move)
+     *  and 1.0 (player can move unimpeded)
+     */
+    fun getTileFluidity() : Float {
+        return mFluidity
     }
 }

@@ -162,7 +162,7 @@ abstract class AbstractTexturedGameObject {
                     // generate the model matrix Note Currently this is only a translation
                     val translationMatrix = FloatArray(16)
                     Matrix.setIdentityM(translationMatrix, 0)   // ensure we are starting from identity
-                    Matrix.translateM(translationMatrix, 0, mPosition.getX(), mPosition.getY(), mPosition.getZ())
+                    Matrix.translateM(translationMatrix, 0, mPosition.X(), mPosition.Y(), mPosition.Z())
 
                     // add the model matrix to the view projection matrix to create the model view projection matrix.
                     val mvpMatrix = FloatArray(16)

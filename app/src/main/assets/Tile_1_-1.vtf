@@ -1,9 +1,10 @@
 <BM>TileThree.obj</BM>
-<SU>Tile_1_1.vtf</SU>
+<SU></SU>
 <SD>Tile_1_0.vtf</SD>
 <SL>Tile_0_-1.vtf</SL>
-<SR>Tile_-1_-1.vtf</SR>
-<UL>Tile_0_1.vtf</UL>
-<UR>Tile_-1_1.vtf</UR>
+<SR></SR>
+<UL></UL>
+<UR></UR>
 <DL>Tile_0_0.vtf</DL>
-<DR>Tile_-1_0.vtf</DR>
+<DR></DR>
+<TF>1.0</TF>

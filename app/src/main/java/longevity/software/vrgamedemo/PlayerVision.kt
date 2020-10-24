@@ -6,13 +6,13 @@ class PlayerVision {
 
     private val PLAYER_Y: Float = 3.0f
 
-    private val mLeftEye = GameCamera(0.0f,3.0f,0.0f,
-                             0.0f, 0.0f, 1.0f,
-                                0.0f, 1.0f, 0.0f)
+    private val mLeftEye = GameCamera(Position3Float(0.0f,3.0f,0.0f),
+        Vector3Float(0.0f, 0.0f, 1.0f),
+        Vector3Float(0.0f, 1.0f, 0.0f))
 
-    private val mRightEye = GameCamera(0.0f,3.0f,0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f)
+    private val mRightEye = GameCamera(Position3Float(0.0f,3.0f,0.0f),
+        Vector3Float(0.0f, 0.0f, 1.0f),
+        Vector3Float(0.0f, 1.0f, 0.0f))
 
     private var mHalfEyeDistance = 0.1f
     private var mLookDistance = 100.0f
@@ -103,12 +103,12 @@ class PlayerVision {
 
         // update the cameras with their new positions
         mLeftEye.setPosition(
-            Vector3Float((leftCameraPositionMatrix.get(12) + x),
+            Position3Float((leftCameraPositionMatrix.get(12) + x),
                 leftCameraPositionMatrix.get(13) + PLAYER_Y,
                 (leftCameraPositionMatrix.get(14) + z))
         )
         mRightEye.setPosition(
-            Vector3Float((rightCameraPositionMatrix.get(12) + x),
+            Position3Float((rightCameraPositionMatrix.get(12) + x),
                 rightCameraPositionMatrix.get(13) + PLAYER_Y,
                 (rightCameraPositionMatrix.get(14) + z))
         )
@@ -123,16 +123,16 @@ class PlayerVision {
 
             mLeftEye.setLookDirection(
                 Vector3Float(
-                    lookPos.getX() - mLeftEye.getPositionX(),
-                    lookPos.getY() - mLeftEye.getPositionY(),
-                    lookPos.getZ() - mLeftEye.getPositionZ()
+                    lookPos.X() - mLeftEye.getPosition().X(),
+                    lookPos.Y() - mLeftEye.getPosition().Y(),
+                    lookPos.Z() - mLeftEye.getPosition().Z()
                 )
             )
             mRightEye.setLookDirection(
                 Vector3Float(
-                    lookPos.getX() - mRightEye.getPositionX(),
-                    lookPos.getY() - mRightEye.getPositionY(),
-                    lookPos.getZ() - mRightEye.getPositionZ()
+                    lookPos.X() - mRightEye.getPosition().X(),
+                    lookPos.Y() - mRightEye.getPosition().Y(),
+                    lookPos.Z() - mRightEye.getPosition().Z()
                 )
             )
         }

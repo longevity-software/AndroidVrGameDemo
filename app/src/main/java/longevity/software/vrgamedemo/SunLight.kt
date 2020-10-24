@@ -113,7 +113,7 @@ class SunLight(modelLoader: ModelLoader) {
     /**
      * Function which updates the position and colour based on the time of day
      */
-    fun UpdateSunLight(percentThroughDay: Float, playerPos: Triple<Float, Float, Float>) {
+    fun UpdateSunLight(percentThroughDay: Float, playerPos: Position3Float) {
 
         val sunAngle = (360.0f * percentThroughDay)
 
@@ -133,7 +133,7 @@ class SunLight(modelLoader: ModelLoader) {
         }
 
         // set the position
-        mSunPosition = Triple((playerPos.first + sunPos[12]), (playerPos.second + sunPos[13]), (playerPos.third + sunPos[14]))
+        mSunPosition = Triple((playerPos.X() + sunPos[12]), (playerPos.Y() + sunPos[13]), (playerPos.Z() + sunPos[14]))
 
         val sunAngleInt = sunAngle.toInt()
 

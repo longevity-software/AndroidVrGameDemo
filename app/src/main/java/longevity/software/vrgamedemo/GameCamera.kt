@@ -1,136 +1,61 @@
 package longevity.software.vrgamedemo
 
-class GameCamera (positionX: Float,
-                  positionY: Float,
-                  positionZ: Float,
-                  lookDirectionX: Float,
-                  lookDirectionY: Float,
-                  lookDirectionZ: Float,
-                  upDirectionX: Float,
-                  upDirectionY: Float,
-                  upDirectionZ: Float) {
+class GameCamera (position: Position3Float,
+                  lookDirection: Vector3Float,
+                  upDirection: Vector3Float) {
 
-    private var mPositionX: Float = positionX
-    private var mPositionY: Float = positionY
-    private var mPositionZ: Float = positionZ
+    private var mPosition = position
 
-    private var mLookDirectionX: Float = lookDirectionX
-    private var mLookDirectionY: Float = lookDirectionY
-    private var mLookDirectionZ: Float = lookDirectionZ
+    private var mLookDirection = lookDirection
 
-    private var mUpDirectionX: Float = upDirectionX
-    private var mUpDirectionY: Float = upDirectionY
-    private var mUpDirectionZ: Float = upDirectionZ
+    private var mUpDirection = upDirection
 
     /**
-     * function to return the x position of the camera.
+     * function to return the position of the camera.
      */
-    fun getPositionX() : Float {
-        return mPositionX
+    fun getPosition() : Position3Float {
+        return mPosition
     }
 
     /**
-     * function to return the y position of the camera.
+     * function to return the the point that the camera is looking at.
      */
-    fun getPositionY() : Float {
-        return mPositionY
+    fun getLookPosition() : Position3Float {
+        return (mPosition + mLookDirection)
     }
 
     /**
-     * function to return the z position of the camera.
+     * function to return the look direction.
      */
-    fun getPositionZ() : Float {
-        return mPositionZ
+    fun getLookDirection() : Vector3Float {
+        return mLookDirection
     }
 
     /**
-     * function to return the x portion of the point that the camera is looking at.
+     * function to return the up direction.
      */
-    fun getLookPositionX() : Float {
-        return (mPositionX + mLookDirectionX)
-    }
-
-    /**
-     * function to return the y portion of the point that the camera is looking at.
-     */
-    fun getLookPositionY() : Float {
-        return (mPositionY + mLookDirectionY)
-    }
-
-    /**
-     * function to return the z portion of the point that the camera is looking at.
-     */
-    fun getLookPositionZ() : Float {
-        return (mPositionZ + mLookDirectionZ)
-    }
-
-    /**
-     * function to return the x portion of the look direction.
-     */
-    fun getLookDirectionX() : Float {
-        return mLookDirectionX
-    }
-
-    /**
-     * function to return the y portion of the look direction.
-     */
-    fun getLookDirectionY() : Float {
-        return mLookDirectionY
-    }
-
-    /**
-     * function to return the z portion of the look direction.
-     */
-    fun getLookDirectionZ() : Float {
-        return mLookDirectionZ
-    }
-
-    /**
-     * function to return the x portion of the up direction.
-     */
-    fun getUpDirectionX() : Float {
-        return mUpDirectionX
-    }
-
-    /**
-     * function to return the y portion of the up direction.
-     */
-    fun getUpDirectionY() : Float {
-        return mUpDirectionY
-    }
-
-    /**
-     * function to return the z portion of the up direction.
-     */
-    fun getUpDirectionZ() : Float {
-        return mUpDirectionZ
+    fun getUpDirection() : Vector3Float {
+        return mUpDirection
     }
 
     /**
      * function to set the camera position
      */
-    fun setPosition(vec: Vector3Float) {
-        mPositionX = vec.getX()
-        mPositionY = vec.getY()
-        mPositionZ = vec.getZ()
+    fun setPosition(pos: Position3Float) {
+        mPosition = pos
     }
 
     /**
      * function to set the direction to look
      */
     fun setLookDirection(vec: Vector3Float) {
-        mLookDirectionX = vec.getX()
-        mLookDirectionY = vec.getY()
-        mLookDirectionZ = vec.getZ()
+        mLookDirection = vec
     }
 
     /**
      * function to set the up direction
      */
     fun setUpDirection(vec: Vector3Float) {
-        mUpDirectionX = vec.getX()
-        mUpDirectionY = vec.getY()
-        mUpDirectionZ = vec.getZ()
+        mUpDirection = vec
     }
-
 }

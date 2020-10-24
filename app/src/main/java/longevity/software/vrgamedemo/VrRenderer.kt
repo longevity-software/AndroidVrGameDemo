@@ -249,9 +249,9 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
 
         // set the camera based on the passed GameCamera
         Matrix.setLookAtM(viewMatrix, 0,
-            camera.getPositionX(), camera.getPositionY(), camera.getPositionZ(),
-            camera.getLookPositionX(), camera.getLookPositionY(), camera.getLookPositionZ(),
-            camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ())
+            camera.getPosition().X(), camera.getPosition().Y(), camera.getPosition().Z(),
+            camera.getLookPosition().X(), camera.getLookPosition().Y(), camera.getLookPosition().Z(),
+            camera.getUpDirection().X(), camera.getUpDirection().Y(), camera.getUpDirection().Z())
 
         // create a view projection matrix
         Matrix.multiplyMM(viewProjectionMatrix, 0, mProjectionMatrix, 0, viewMatrix, 0)
@@ -259,7 +259,7 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
         mScene.draw(viewProjectionMatrix,
             mSunLight.getSunPosition(),       // light position
             mSunLight.getLightColour(),        // light colour
-            Triple(camera.getPositionX(), camera.getPositionY(), camera.getPositionZ())
+            Triple(camera.getPosition().X(), camera.getPosition().Y(), camera.getPosition().Z())
             )
 
         // render the sun
@@ -269,8 +269,8 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
         // set the camera based on the passed GameCamera but without the translation element
         Matrix.setLookAtM(skyboxViewMatrix, 0,
             0.0f, 0.0f, 0.0f,
-            camera.getLookDirectionX(), camera.getLookDirectionY(), camera.getLookDirectionZ(),
-            camera.getUpDirectionX(), camera.getUpDirectionY(), camera.getUpDirectionZ()
+            camera.getLookDirection().X(), camera.getLookDirection().Y(), camera.getLookDirection().Z(),
+            camera.getUpDirection().X(), camera.getUpDirection().Y(), camera.getUpDirection().Z()
         )
 
         // create a view projection matrix without the translation

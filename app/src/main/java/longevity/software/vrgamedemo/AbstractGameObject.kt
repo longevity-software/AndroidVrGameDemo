@@ -115,7 +115,7 @@ abstract class AbstractGameObject() {
     private var mParametersHaveBeenSet: Boolean
 
     // variables used to generate the model matrix
-    private var mPosition: Vector3Float
+    private var mPosition: Position3Float
     private var mScale: Vector3Float
     private var mRotation: Float
 
@@ -127,7 +127,7 @@ abstract class AbstractGameObject() {
         mParametersHaveBeenSet = false
 
         // set the initial position, rotation and scale.
-        mPosition = Vector3Float(0.0f, 0.0f, 0.0f)
+        mPosition = Position3Float(0.0f, 0.0f, 0.0f)
         mScale = Vector3Float(1.0f, 1.0f, 1.0f)
         mRotation = 0.0f
 
@@ -333,9 +333,9 @@ abstract class AbstractGameObject() {
                                         Matrix.translateM(
                                             translationMatrix,
                                             0,
-                                            mPosition.getX(),
-                                            mPosition.getY(),
-                                            mPosition.getZ()
+                                            mPosition.X(),
+                                            mPosition.Y(),
+                                            mPosition.Z()
                                         )
 
                                         val scaleMatrix = FloatArray(16).also {
@@ -343,9 +343,9 @@ abstract class AbstractGameObject() {
                                             Matrix.scaleM(
                                                 it,
                                                 0,
-                                                mScale.getX(),
-                                                mScale.getY(),
-                                                mScale.getZ()
+                                                mScale.X(),
+                                                mScale.Y(),
+                                                mScale.Z()
                                             )
                                         }
 
@@ -463,14 +463,14 @@ abstract class AbstractGameObject() {
      * function to change the position of the GameObject
      */
     fun setPosition(x: Float, y: Float, z: Float) {
-        mPosition = Vector3Float(x, y, z)
+        mPosition = Position3Float(x, y, z)
     }
 
     /**
      * function to get the position
      */
-    fun getPosition() : Triple<Float, Float, Float> {
-        return Triple(mPosition.getX(), mPosition.getY(), mPosition.getZ())
+    fun getPosition() : Position3Float {
+        return mPosition
     }
 
     fun setScale(scale: Vector3Float) {

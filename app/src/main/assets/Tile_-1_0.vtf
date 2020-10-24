@@ -1,9 +1,10 @@
 <BM>TileFour.obj</BM>
 <SU>Tile_-1_-1.vtf</SU>
 <SD>Tile_-1_1.vtf</SD>
-<SL>Tile_1_0.vtf</SL>
+<SL></SL>
 <SR>Tile_0_0.vtf</SR>
-<UL>Tile_1_-1.vtf</UL>
+<UL></UL>
 <UR>Tile_0_-1.vtf</UR>
-<DL>Tile_1_1.vtf</DL>
+<DL></DL>
 <DR>Tile_0_1.vtf</DR>
+<TF>1.0</TF>

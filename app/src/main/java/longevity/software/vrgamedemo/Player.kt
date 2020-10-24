@@ -2,11 +2,9 @@ package longevity.software.vrgamedemo
 
 import android.opengl.Matrix
 
-class Player(originX: Float, originY: Float, originZ: Float, vis: PlayerVision) {
+class Player(origin: Position3Float, vis: PlayerVision) {
 
-    private var mPlayerX = originX
-    private var mPlayerY = originY
-    private var mPlayerZ = originZ
+    private var mPlayerPosition = origin
 
     private val mPlayerVision = vis
 
@@ -37,36 +35,26 @@ class Player(originX: Float, originY: Float, originZ: Float, vis: PlayerVision) 
             Matrix.multiplyMM(it, 0, moveRotationMatrix, 0, it, 0)
         }
 
-        // extract and adjust the player position by the x, y and z components
-        //mPlayerX += translationMatrix.get(12)
-        //mPlayerY += translationMatrix.get(13)
-        //mPlayerZ += translationMatrix.get(14)
-
-        val newPosition = tileMap.getPlayerPositionOnTileMap(
-            Triple(                         // current
-                mPlayerX,
-                mPlayerY,
-                mPlayerZ
-            ),
-            Triple(                         // detla
-                translationMatrix.get(12),
-                translationMatrix.get(13),
-                translationMatrix.get(14)
-            )
+        val targetVector = Vector3Float(
+            translationMatrix.get(12),
+            translationMatrix.get(13),
+            translationMatrix.get(14)
         )
 
-        mPlayerX = newPosition.first
-        mPlayerY = newPosition.second
-        mPlayerZ = newPosition.third
+        mPlayerPosition = tileMap.getPlayerPositionOnTileMap(
+            mPlayerPosition,
+            targetVector,
+            targetVector.getLength()
+        )
 
         // update what the player can see.
-        mPlayerVision.setVision(headPitch, headYaw, mPlayerX, mPlayerZ)
+        mPlayerVision.setVision(headPitch, headYaw, mPlayerPosition.X(), mPlayerPosition.Z())
     }
 
     /**
-     * Gets the players current position as a Triple
+     * Gets the players current position
      */
-    fun getPosition() : Triple<Float, Float, Float> {
-        return Triple(mPlayerX, mPlayerY, mPlayerZ)
+    fun getPosition() : Position3Float {
+        return mPlayerPosition
     }
 }

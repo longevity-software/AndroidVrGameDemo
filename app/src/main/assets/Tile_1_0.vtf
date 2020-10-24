@@ -2,8 +2,9 @@
 <SU>Tile_1_-1.vtf</SU>
 <SD>Tile_1_1.vtf</SD>
 <SL>Tile_0_0.vtf</SL>
-<SR>Tile_-1_0.vtf</SR>
+<SR></SR>
 <UL>Tile_0_-1.vtf</UL>
-<UR>Tile_-1_-1.vtf</UR>
+<UR></UR>
 <DL>Tile_0_1.vtf</DL>
-<DR>Tile_-1_1.vtf</DR>
+<DR></DR>
+<TF>1.0</TF>

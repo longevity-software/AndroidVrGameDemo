@@ -1,5 +1,5 @@
 package longevity.software.vrgamedemo
 
 interface PlayerPositionTileMapInterface {
-    fun getPlayerPositionOnTileMap(current : Triple<Float, Float, Float>, delta : Triple<Float, Float, Float>) : Triple<Float, Float, Float>
+    fun getPlayerPositionOnTileMap(current : Position3Float, directionVector : Vector3Float, distance: Float) : Position3Float
 }

@@ -13,15 +13,16 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
         val reader = BufferedReader(InputStreamReader(inStream))
 
         // all the variables for creating a tile
-        var baseModel: String = ""
-        var upLeft: String = ""
-        var straightUp: String = ""
-        var upRight: String = ""
-        var left: String = ""
-        var right: String = ""
-        var downLeft: String = ""
-        var straightDown: String = ""
-        var downRight: String = ""
+        var baseModel = ""
+        var upLeft = ""
+        var straightUp = ""
+        var upRight = ""
+        var left = ""
+        var right = ""
+        var downLeft = ""
+        var straightDown = ""
+        var downRight = ""
+        var fluidity = 0.0f
 
         reader.forEachLine {
 
@@ -54,9 +55,19 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
             else if ( it.startsWith("<DR>" ) ) {
                 downRight = it.substringAfter("<DR>").substringBefore("</DR>")
             }
+            else if ( it.startsWith( "<TF>" ) ) {
+                val fluidityString = it.substringAfter("<TF>").substringBefore("</TF>")
+
+                // set viscosity if it is a valid float value
+                fluidityString.toFloatOrNull().also {
+                    if ( null != it ) {
+                        fluidity = it
+                    }
+                }
+            }
         }
 
-        mTile = Tile(baseModel, modelLoader, upLeft, straightUp, upRight, left, right, downLeft, straightDown, downRight)
+        mTile = Tile(baseModel, modelLoader, file, upLeft, straightUp, upRight, left, right, downLeft, straightDown, downRight, fluidity)
     }
 
     /**

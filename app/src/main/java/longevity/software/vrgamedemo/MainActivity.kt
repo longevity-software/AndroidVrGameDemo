@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     BitmapFactory.decodeResource(getResources(), R.drawable.bottom))
 
         // initialise the player instance
-        mPlayer = Player(0.0f, 1.0f, 0.0f, mPlayerVision)
+        mPlayer = Player(Position3Float(0.0f, 1.0f, 0.0f), mPlayerVision)
 
         // load all the models
         mModelLoader = ModelLoader(this)
