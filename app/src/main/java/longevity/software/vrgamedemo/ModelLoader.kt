@@ -21,6 +21,11 @@ class ModelLoader(context: Context) {
 
     val TILE_EMPTY = "emptyTile.obj"
 
+    val TILE_STRAIGHT = "Straight.obj"
+    val TILE_CORNER = "Corner.obj"
+    val TILE_CROSSROADS = "Crossroads.obj"
+    val TILE_JUNCTION = "Junction.obj"
+
     private val mModelMap = HashMap<String, ModelData>()
     private val mDefaultModel: ModelData
 
@@ -43,6 +48,11 @@ class ModelLoader(context: Context) {
         mModelMap.put(TILE_EIGHT_MODEL, ObjectAndMaterialFileParser(context, TILE_EIGHT_MODEL).getModelData())
         mModelMap.put(TILE_NINE_MODEL, ObjectAndMaterialFileParser(context, TILE_NINE_MODEL).getModelData())
         mModelMap.put(TILE_EMPTY, ObjectAndMaterialFileParser(context, TILE_EMPTY).getModelData())
+
+        mModelMap.put(TILE_STRAIGHT, ObjectAndMaterialFileParser(context, TILE_STRAIGHT).getModelData())
+        mModelMap.put(TILE_CORNER, ObjectAndMaterialFileParser(context, TILE_CORNER).getModelData())
+        mModelMap.put(TILE_CROSSROADS, ObjectAndMaterialFileParser(context, TILE_CROSSROADS).getModelData())
+        mModelMap.put(TILE_JUNCTION, ObjectAndMaterialFileParser(context, TILE_JUNCTION).getModelData())
     }
 
     /**

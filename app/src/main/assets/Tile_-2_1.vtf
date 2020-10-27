@@ -1,11 +1,11 @@
 <BM>Straight.obj</BM>
-<BR>Left</BR>
-<SU>Tile_1_0.vtf</SU>
+<BR>Right</BR>
+<SU>Tile_-2_0.vtf</SU>
 <SD></SD>
 <SL></SL>
 <SR></SR>
-<UL>Tile_0_0.vtf</UL>
-<UR>Tile_2_0.vtf</UR>
+<UL></UL>
+<UR>Tile_-1_0.vtf</UR>
 <DL></DL>
 <DR></DR>
 <TF>1.0</TF>

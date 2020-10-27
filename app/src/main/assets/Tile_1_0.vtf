@@ -1,10 +1,11 @@
-<BM>TileSix.obj</BM>
+<BM>Crossroads.obj</BM>
+<BR>None</BR>
 <SU>Tile_1_-1.vtf</SU>
 <SD>Tile_1_1.vtf</SD>
 <SL>Tile_0_0.vtf</SL>
-<SR></SR>
-<UL>Tile_0_-1.vtf</UL>
+<SR>Tile_2_0.vtf</SR>
+<UL></UL>
 <UR></UR>
-<DL>Tile_0_1.vtf</DL>
+<DL></DL>
 <DR></DR>
 <TF>1.0</TF>

@@ -312,6 +312,7 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
         val intersectionYNumerator = ((((x1 * y2) - (y1 * x2)) * (y3 - y4)) - ((y1 - y2) * ((x3 * y4) - (y3 * x4))))
         val intersectionDivisor = (((x1 - x2) * (y3 - y4)) - ((y1 - y2) * (x3 - x4)))
 
+        // TODO - check for Zero divisor
         return Position3Float((intersectionXNumerator / intersectionDivisor), 0.0f, (intersectionYNumerator / intersectionDivisor))
     }
 }

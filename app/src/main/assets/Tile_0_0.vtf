@@ -1,10 +1,11 @@
-<BM>TileFive.obj</BM>
-<SU>Tile_0_-1.vtf</SU>
-<SD>Tile_0_1.vtf</SD>
+<BM>Straight.obj</BM>
+<BR>None</BR>
+<SU></SU>
+<SD></SD>
 <SL>Tile_-1_0.vtf</SL>
 <SR>Tile_1_0.vtf</SR>
 <UL>Tile_-1_-1.vtf</UL>
-<UR>Tile_1_-1.vtf</UR>
-<DL>Tile_-1_1.vtf</DL>
+<UR>Tile_-1_-1.vtf</UR>
+<DL></DL>
 <DR>Tile_1_1.vtf</DR>
 <TF>1.0</TF>
