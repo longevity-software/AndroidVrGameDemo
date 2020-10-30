@@ -1,10 +1,10 @@
-<BM>Crossroads.obj</BM>
+<BM>Grass.obj</BM>
 <BR>None</BR>
 <SU>Tile_1_-1.vtf</SU>
 <SD>Tile_1_1.vtf</SD>
 <SL>Tile_0_0.vtf</SL>
 <SR>Tile_2_0.vtf</SR>
-<UL></UL>
+<UL>Tile_0_-1.vtf</UL>
 <UR></UR>
 <DL></DL>
 <DR></DR>

@@ -14,6 +14,7 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
 
         // all the variables for creating a tile
         var baseModel = ""
+        var baseRotation = ""
         var upLeft = ""
         var straightUp = ""
         var upRight = ""
@@ -24,12 +25,24 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
         var downRight = ""
         var fluidity = 0.0f
 
+        val gameObjects = ArrayList<Triple<String, Position3Float, Float>>()
+
+        val GAME_OBJECT_MODEL_INDEX = 0
+        val GAME_OBJECT_X_POSITION_INDEX = 1
+        val GAME_OBJECT_Y_POSITION_INDEX = 2
+        val GAME_OBJECT_Z_POSITION_INDEX = 3
+        val GAME_OBJECT_ROTATION_INDEX = 4
+
         reader.forEachLine {
 
             // if this the base model definition
             if ( it.startsWith("<BM>" ) ) {
 
                 baseModel = it.substringAfter("<BM>").substringBefore("</BM>")
+            }
+            else if ( it.startsWith("<BR>" ) ) {
+
+                baseRotation = it.substringAfter("<BR>").substringBefore("</BR>")
             }
             else if ( it.startsWith( "<UL>" ) ) {
                 upLeft = it.substringAfter("<UL>").substringBefore("</UL>")
@@ -65,9 +78,19 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
                     }
                 }
             }
+            else if ( it.startsWith( "<GO>" ) ) {
+                val settingsString = it.substringAfter("<GO>").substringBefore("</GO>")
+                val settings = settingsString.split( "," )
+
+                gameObjects.add(Triple(settings[GAME_OBJECT_MODEL_INDEX],
+                    Position3Float(settings[GAME_OBJECT_X_POSITION_INDEX].toFloat(),
+                        settings[GAME_OBJECT_Y_POSITION_INDEX].toFloat(),
+                        settings[GAME_OBJECT_Z_POSITION_INDEX].toFloat()),
+                    settings[GAME_OBJECT_ROTATION_INDEX].toFloat()))
+            }
         }
 
-        mTile = Tile(baseModel, modelLoader, file, upLeft, straightUp, upRight, left, right, downLeft, straightDown, downRight, fluidity)
+        mTile = Tile(baseModel, baseRotation, modelLoader, file, upLeft, straightUp, upRight, left, right, downLeft, straightDown, downRight, fluidity, gameObjects)
     }
 
     /**

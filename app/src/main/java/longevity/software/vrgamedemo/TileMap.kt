@@ -214,19 +214,266 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
                         endPosition = intersectionPoint
                     }
                 }
-                /* TODO - Need to cater for when the player goes diagonally
                 MOVE_UP_AND_RIGHT -> {
+                    // find the intersection point for both edges
+                    val intersectionUp = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE)
+                    )
 
+                    val intersectionRight = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE)
+                    )
+
+                    // get the distance to each point
+                    val upDistance = startPosition.distanceTo(intersectionUp)
+                    val rightDistance = startPosition.distanceTo(intersectionRight)
+
+                    // create variables used later
+                    var nextTile = currentTile
+                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+
+                    // check for identical distances
+                    if ( upDistance == rightDistance ) {
+                        // distances are the same so move directly diagonal
+                        intersectionPoint = intersectionUp  // both are the same so it doesn't matter which we use.
+
+                        // the next tile is up and right
+                        nextTile += (TILE_ABOVE_OFFSET + TILE_RIGHT_OFFSET)
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(TILE_SIZE, 0.0f, -TILE_SIZE)
+                    }
+                    else if ( upDistance < rightDistance ) {
+                        // up distance is the closest so move to the tile above
+                        intersectionPoint = intersectionUp
+
+                        // the next tile is up
+                        nextTile += TILE_ABOVE_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(0.0f, 0.0f, -TILE_SIZE)
+                    }
+                    else {
+                        // right edge must be the closest
+                        intersectionPoint = intersectionRight
+
+                        // the next tile is right
+                        nextTile += TILE_RIGHT_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(TILE_SIZE, 0.0f, 0.0f)
+                    }
+
+                    // don't actually enter the next tile if it has no fluidity
+                    if ( mTiles[nextTile]!!.getTileFluidity() > 0.0f ) {
+                        currentTile = nextTile
+                        endPosition = (intersectionPoint - offset)
+                    }
+                    else {
+                        endPosition = intersectionPoint
+                    }
                 }
                 MOVE_UP_AND_LEFT -> {
+                    // find the intersection point for both edges
+                    val intersectionUp = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE)
+                    )
 
+                    val intersectionLeft = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE)
+                    )
+
+                    // get the distance to each point
+                    val upDistance = startPosition.distanceTo(intersectionUp)
+                    val leftDistance = startPosition.distanceTo(intersectionLeft)
+
+                    // create variables used later
+                    var nextTile = currentTile
+                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+
+                    // check for identical distances
+                    if ( upDistance == leftDistance ) {
+                        // distances are the same so move directly diagonal
+                        intersectionPoint = intersectionUp  // both are the same so it doesn't matter which we use.
+
+                        // the next tile is up and right
+                        nextTile += (TILE_ABOVE_OFFSET + TILE_LEFT_OFFSET)
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(-TILE_SIZE, 0.0f, -TILE_SIZE)
+                    }
+                    else if ( upDistance < leftDistance ) {
+                        // up distance is the closest so move to the tile above
+                        intersectionPoint = intersectionUp
+
+                        // the next tile is up
+                        nextTile += TILE_ABOVE_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(0.0f, 0.0f, -TILE_SIZE)
+                    }
+                    else {
+                        // leftt edge must be the closest
+                        intersectionPoint = intersectionLeft
+
+                        // the next tile is right
+                        nextTile += TILE_LEFT_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(-TILE_SIZE, 0.0f, 0.0f)
+                    }
+
+                    // don't actually enter the next tile if it has no fluidity
+                    if ( mTiles[nextTile]!!.getTileFluidity() > 0.0f ) {
+                        currentTile = nextTile
+                        endPosition = (intersectionPoint - offset)
+                    }
+                    else {
+                        endPosition = intersectionPoint
+                    }
                 }
                 MOVE_DOWN_AND_RIGHT -> {
+                    // find the intersection point for both edges
+                    val intersectionDown = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE)
+                    )
 
+                    val intersectionRight = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE)
+                    )
+
+                    // get the distance to each point
+                    val downDistance = startPosition.distanceTo(intersectionDown)
+                    val rightDistance = startPosition.distanceTo(intersectionRight)
+
+                    // create variables used later
+                    var nextTile = currentTile
+                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+
+                    // check for identical distances
+                    if ( downDistance == rightDistance ) {
+                        // distances are the same so move directly diagonal
+                        intersectionPoint = intersectionDown  // both are the same so it doesn't matter which we use.
+
+                        // the next tile is down and right
+                        nextTile += (TILE_BELOW_OFFSET + TILE_RIGHT_OFFSET)
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(TILE_SIZE, 0.0f, TILE_SIZE)
+                    }
+                    else if ( downDistance < rightDistance ) {
+                        // down distance is the closest so move to the tile above
+                        intersectionPoint = intersectionDown
+
+                        // the next tile is down
+                        nextTile += TILE_BELOW_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(0.0f, 0.0f, TILE_SIZE)
+                    }
+                    else {
+                        // right edge must be the closest
+                        intersectionPoint = intersectionRight
+
+                        // the next tile is right
+                        nextTile += TILE_RIGHT_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(TILE_SIZE, 0.0f, 0.0f)
+                    }
+
+                    // don't actually enter the next tile if it has no fluidity
+                    if ( mTiles[nextTile]!!.getTileFluidity() > 0.0f ) {
+                        currentTile = nextTile
+                        endPosition = (intersectionPoint - offset)
+                    }
+                    else {
+                        endPosition = intersectionPoint
+                    }
                 }
                 MOVE_DOWN_AND_LEFT -> {
+                    // find the intersection point for both edges
+                    val intersectionDown = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE)
+                    )
 
-                }*/
+                    val intersectionLeft = getIntersectionPoint2D(
+                        startPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, -HALF_TILE_SIZE),
+                        travelPosition,
+                        Position3Float(-HALF_TILE_SIZE, 0.0f, HALF_TILE_SIZE)
+                    )
+
+                    // get the distance to each point
+                    val downDistance = startPosition.distanceTo(intersectionDown)
+                    val leftDistance = startPosition.distanceTo(intersectionLeft)
+
+                    // create variables used later
+                    var nextTile = currentTile
+                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+
+                    // check for identical distances
+                    if ( downDistance == leftDistance ) {
+                        // distances are the same so move directly diagonal
+                        intersectionPoint = intersectionDown  // both are the same so it doesn't matter which we use.
+
+                        // the next tile is down and right
+                        nextTile += (TILE_BELOW_OFFSET + TILE_LEFT_OFFSET)
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(-TILE_SIZE, 0.0f, TILE_SIZE)
+                    }
+                    else if ( downDistance < leftDistance ) {
+                        // down distance is the closest so move to the tile above
+                        intersectionPoint = intersectionDown
+
+                        // the next tile is down
+                        nextTile += TILE_BELOW_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(0.0f, 0.0f, TILE_SIZE)
+                    }
+                    else {
+                        // left edge must be the closest
+                        intersectionPoint = intersectionLeft
+
+                        // the next tile is right
+                        nextTile += TILE_LEFT_OFFSET
+
+                        // set the offset to remove from the intersection point
+                        offset = Position3Float(-TILE_SIZE, 0.0f, 0.0f)
+                    }
+
+                    // don't actually enter the next tile if it has no fluidity
+                    if ( mTiles[nextTile]!!.getTileFluidity() > 0.0f ) {
+                        currentTile = nextTile
+                        endPosition = (intersectionPoint - offset)
+                    }
+                    else {
+                        endPosition = intersectionPoint
+                    }
+                }
                 else -> endPosition = travelPosition
             }
 

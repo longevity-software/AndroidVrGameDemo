@@ -1,8 +1,8 @@
-<BM>Straight.obj</BM>
+<BM>Grass.obj</BM>
 <BR>Right</BR>
 <SU>Tile_1_-2.vtf</SU>
 <SD>Tile_1_0.vtf</SD>
-<SL></SL>
+<SL>Tile_0_-1.vtf</SL>
 <SR></SR>
 <UL></UL>
 <UR>Tile_2_-2.vtf</UR>

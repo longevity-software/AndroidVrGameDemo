@@ -1,6 +1,7 @@
 package longevity.software.vrgamedemo
 
 class Tile(baseModel: String,
+           baseRotation: String,
            modelLoader: ModelLoader,
            tileName: String,
            upLeft: String,
@@ -11,11 +12,14 @@ class Tile(baseModel: String,
            downLeft: String,
            straightDown: String,
            downRight: String,
-           fluidity: Float) : DrawableInterface {
+           fluidity: Float,
+           gameObjectData: ArrayList<Triple<String, Position3Float, Float>>) : DrawableInterface {
 
     private val mEMPTY_TILE_STRING = "Empty_tile.vtf"
+    private val mBASE_MODEL_INDEX = 0
 
     private var mBaseModel = baseModel
+    private var mBaseRotation = baseRotation
 
     private var mStaticModels = ArrayList<AbstractGameObject>()
 
@@ -38,6 +42,8 @@ class Tile(baseModel: String,
     private val mTileStraightDown = straightDown
     private val mTileDownAndRight = downRight
 
+    private val mGameOjectData = gameObjectData
+
     /**
      * Function to initialise the static models
      */
@@ -50,11 +56,36 @@ class Tile(baseModel: String,
             mBaseModel = mModelLoader.TILE_EMPTY
         }
 
+        mStaticModels.clear()   // ensure there are no models
         mStaticModels.add(GenericGameObject(mModelLoader.getModelData(mBaseModel)))
+
+        // set the rotation of the base model
+        when (mBaseRotation) {
+            "Left" -> {
+                mStaticModels[mBASE_MODEL_INDEX].setYRotation(270.0f)
+            }
+            "Right" -> {
+                mStaticModels[mBASE_MODEL_INDEX].setYRotation(90.0f)
+            }
+            "Flip" -> {
+                mStaticModels[mBASE_MODEL_INDEX].setYRotation(180.0f)
+            }
+        }
+
+        // add game objects
+        for ( gameObject in mGameOjectData ) {
+
+            val obj = GenericGameObject(mModelLoader.getModelData(gameObject.first))
+            obj.setPosition(gameObject.second.X(), gameObject.second.Y(), gameObject.second.Z())
+            obj.setYRotation(gameObject.third)
+
+            mStaticModels.add(obj)
+        }
 
         // apply the current offsets
         for (model in mStaticModels) {
-            model.setPosition(mXOffset, 0.0f, mZOffset)
+            val localPosition = model.getPosition()
+            model.setPosition( ( localPosition.X() + mXOffset ), ( localPosition.Y() + 0.0f ) , ( localPosition.Z() + mZOffset ) )
         }
 
         // models have now been initialised.

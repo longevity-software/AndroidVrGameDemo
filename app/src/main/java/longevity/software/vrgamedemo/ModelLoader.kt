@@ -26,6 +26,8 @@ class ModelLoader(context: Context) {
     val TILE_CROSSROADS = "Crossroads.obj"
     val TILE_JUNCTION = "Junction.obj"
 
+    val ROCKS_MODEL = "Rocks.obj"
+
     private val mModelMap = HashMap<String, ModelData>()
     private val mDefaultModel: ModelData
 
@@ -53,6 +55,8 @@ class ModelLoader(context: Context) {
         mModelMap.put(TILE_CORNER, ObjectAndMaterialFileParser(context, TILE_CORNER).getModelData())
         mModelMap.put(TILE_CROSSROADS, ObjectAndMaterialFileParser(context, TILE_CROSSROADS).getModelData())
         mModelMap.put(TILE_JUNCTION, ObjectAndMaterialFileParser(context, TILE_JUNCTION).getModelData())
+
+        mModelMap.put(ROCKS_MODEL, ObjectAndMaterialFileParser(context, ROCKS_MODEL).getModelData())
     }
 
     /**

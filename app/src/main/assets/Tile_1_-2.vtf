@@ -1,4 +1,4 @@
-<BM>Corner.obj</BM>
+<BM>Grass.obj</BM>
 <BR>None</BR>
 <SU></SU>
 <SD>Tile_1_-1.vtf</SD>
@@ -6,6 +6,6 @@
 <SR>Tile_2_-2.vtf</SR>
 <UL></UL>
 <UR></UR>
-<DL></DL>
+<DL>Tile_0_-1.vtf</DL>
 <DR></DR>
 <TF>1.0</TF>

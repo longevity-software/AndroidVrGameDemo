@@ -4,8 +4,11 @@
 <SD>Tile_0_0.vtf</SD>
 <SL>Tile_-1_-1.vtf</SL>
 <SR>Tile_1_-1.vtf</SR>
-<UL></UL>
-<UR></UR>
+<UL>Tile_-1_-2.vtf</UL>
+<UR>Tile_1_-2.vtf</UR>
 <DL>Tile_-1_0.vtf</DL>
 <DR>Tile_1_0.vtf</DR>
 <TF>1.0</TF>
+<GO>Tree.obj,0.0,0.0,10.0,45.0</GO>
+<GO>Rocks.obj,10.0,0.0,10.0,0.0</GO>
+<GO>Rocks.obj,-10.0,0.0,10.0,315.0</GO>

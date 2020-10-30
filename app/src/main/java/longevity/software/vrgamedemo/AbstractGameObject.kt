@@ -473,7 +473,17 @@ abstract class AbstractGameObject() {
         return mPosition
     }
 
+    /**
+     * function to set the models scale
+     */
     fun setScale(scale: Vector3Float) {
         mScale = scale
+    }
+
+    /**
+     * function to set the Y axis Rotation
+     */
+    fun setYRotation(rot: Float) {
+        mRotation = rot
     }
 }

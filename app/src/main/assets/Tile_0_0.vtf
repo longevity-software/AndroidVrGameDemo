@@ -1,6 +1,6 @@
-<BM>Straight.obj</BM>
+<BM>Grass.obj</BM>
 <BR>None</BR>
-<SU></SU>
+<SU>Tile_0_-1.vtf</SU>
 <SD></SD>
 <SL>Tile_-1_0.vtf</SL>
 <SR>Tile_1_0.vtf</SR>
