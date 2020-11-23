@@ -1,10 +1,9 @@
 package longevity.software.vrgamedemo
 
 import android.content.Context
-import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 
-class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox, sun: SunLight, scene: DrawableInterface) : GLSurfaceView(context){
+class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox, sun: SunLight, scene: DrawableInterface, transparent: DrawableInterface) : GLSurfaceView(context){
 
     private val mRenderer: VrRenderer
 
@@ -17,21 +16,24 @@ class VrGlSurfaceView(context: Context, vis: PlayerVision, sky: SkyBox, sun: Sun
         setEGLContextClientVersion(2)
 
         // instantiate the renderer and set it to be used
-        mRenderer = VrRenderer(vis, sky, sun, scene)
+        mRenderer = VrRenderer(vis, sky, sun, scene, transparent)
         setRenderer(mRenderer)
 
         // set it to only render when we want it to.
         setRenderMode(RENDERMODE_WHEN_DIRTY)
     }
 
+    fun AquireRenderLock() {
+
+        mRenderer.AquireLock()
+    }
+
     /**
      * sets the camera position and then renders the scene
      */
-    fun reRenderTheScene()
-    {
-        this.requestRender()
+    fun ReleasLockAndRenderTheScene() {
+        mRenderer.ReleaseLock()
 
-        // and wait for the rendering to finish
-        GLES20.glFinish()
+        this.requestRender()
     }
 }

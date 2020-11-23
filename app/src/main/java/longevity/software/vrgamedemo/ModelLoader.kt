@@ -28,6 +28,9 @@ class ModelLoader(context: Context) {
 
     val ROCKS_MODEL = "Rocks.obj"
 
+    val TREE_TRANSPARENT_MODEL = "TreeTransparent.obj"
+    val ROCKS_TRANSPARENT_MODEL = "RocksTransparent.obj"
+
     private val mModelMap = HashMap<String, ModelData>()
     private val mDefaultModel: ModelData
 
@@ -57,6 +60,10 @@ class ModelLoader(context: Context) {
         mModelMap.put(TILE_JUNCTION, ObjectAndMaterialFileParser(context, TILE_JUNCTION).getModelData())
 
         mModelMap.put(ROCKS_MODEL, ObjectAndMaterialFileParser(context, ROCKS_MODEL).getModelData())
+
+        // transparent models
+        mModelMap.put(TREE_TRANSPARENT_MODEL, ObjectAndMaterialFileParser(context, TREE_TRANSPARENT_MODEL).getModelData())
+        mModelMap.put(ROCKS_TRANSPARENT_MODEL, ObjectAndMaterialFileParser(context, ROCKS_TRANSPARENT_MODEL).getModelData())
     }
 
     /**

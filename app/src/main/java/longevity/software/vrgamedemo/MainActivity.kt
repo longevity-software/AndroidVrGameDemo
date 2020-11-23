@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mModelLoader: ModelLoader
     private lateinit var mSunLight: SunLight
     private lateinit var mTileMap: TileMap
+    private lateinit var mObjectPlacer: ObjectPlacer
 
     /**
      * function called when the Main activity is created.
@@ -66,15 +67,19 @@ class MainActivity : AppCompatActivity() {
         // initialise the tile map
         mTileMap = TileMap(this, mModelLoader)
 
-        // create local insance of the VrGlSurfaceView so we can set it
+         // initialise the object placer
+        mObjectPlacer = ObjectPlacer(mModelLoader)
+        mObjectPlacer.setModelToBePlaced("Tree")
+
+        // create local instance of the VrGlSurfaceView so we can set it
         // as the content view and we can pass it to the GameLoop
-        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision, mSkyBox, mSunLight, mTileMap)
+        mVrGlSurfaceView = VrGlSurfaceView(this, mPlayerVision, mSkyBox, mSunLight, mTileMap, mObjectPlacer)
 
         // set the content to our VrGlSurfaceView
         setContentView(mVrGlSurfaceView)
 
         // Initialise the game loop
-        mGameLoop = GameLoop(mVrGlSurfaceView, mPlayerControlHub, mPlayer, mSunLight, mPlayerVision, mTileMap)
+        mGameLoop = GameLoop(mVrGlSurfaceView, mPlayerControlHub, mPlayer, mSunLight, mPlayerVision, mTileMap, mObjectPlacer)
     }
 
     /**

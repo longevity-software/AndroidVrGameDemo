@@ -489,6 +489,7 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
         // has the tile changed
         if ( CENTER_TILE_INDEX != currentTile ) {
+
             // if the current tile is no longer the center then readjust
             // for now we redraw all, there is probably a more efficient way of doing this though
             mTiles[CENTER_TILE_INDEX] = VrTileFormatParser(mContext, mTiles[currentTile]!!.getTileName(), mModelLoader).getParsedTile()
@@ -535,6 +536,15 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
         for (i in 0 until NUMBER_OF_TILES) {
             mTiles[i]?.draw(vpMatrix, lightPos, lightColour, cameraPos)
         }
+    }
+
+    /**
+     * function to test if a point is valid on the tile map
+     */
+    fun isPositionValidOnTileMap(pos: Position3Float) : Boolean {
+        // position is valid if it is on the tile map
+        return !(( Math.abs(pos.X()) > ( TILE_SIZE + HALF_TILE_SIZE ) )
+                || ( Math.abs(pos.Z()) > ( TILE_SIZE + HALF_TILE_SIZE ) ))
     }
 
     /**

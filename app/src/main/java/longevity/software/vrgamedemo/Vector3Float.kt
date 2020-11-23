@@ -63,6 +63,18 @@ class Vector3Float(x: Float, y: Float, z: Float) {
     }
 
     /**
+     * function to get the dot product of two vectors
+     */
+    fun AngleToVector(vec: Vector3Float) : Float {
+        val normThis = this.getNormalised()
+        val normThat = vec.getNormalised()
+
+        val dot = ( (normThis.X() * normThat.X()) + (normThis.Y() * normThat.Y()) + (normThis.Z() * normThat.Z()) ).toDouble()
+
+        return Math.acos(dot).toFloat()
+    }
+
+    /**
      * Defines how a Vector3Float is multiplied by a scalar float
      */
     operator fun times(multiplier: Float) : Vector3Float {

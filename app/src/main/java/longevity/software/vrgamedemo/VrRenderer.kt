@@ -6,10 +6,11 @@ import android.opengl.Matrix
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.IntBuffer
+import java.util.concurrent.locks.ReentrantLock
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: DrawableInterface) : GLSurfaceView.Renderer {
+class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: DrawableInterface, transparent: DrawableInterface) : GLSurfaceView.Renderer {
 
     // Matrices for generating the view projection portion of the model view projection matrix
     private val mProjectionMatrix = FloatArray(16)
@@ -40,6 +41,7 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
 
     // local copy of the scene
     private val mScene = scene
+    private val mTransparentObject = transparent
 
     // the skybox background
     private val mSkyBox = sky
@@ -51,7 +53,10 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
 
     // Vies constants
     private val NEAR_DISTANCE = 0.5f
-    private val FAR_DISTANCE = 100.0f
+    private val FAR_DISTANCE = 50.0f
+
+    // render lock
+    private val mRenderLock = ReentrantLock()
 
     /**
      * Function called when the surface is created.
@@ -139,13 +144,19 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
         GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         GLES20.glDepthFunc(GLES20.GL_LEQUAL)
 
+        // cull the back faces
         GLES20.glEnable(GLES20.GL_CULL_FACE)
+
+        // enable transparency
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
         // initialise the sunlight model
         mSunLight.initialise()
 
         // initialise the scene
         mScene.initialise()
+        mTransparentObject.initialise()
 
         // set up the projection matrix for rendering to the framebuffers
         val ratio: Float = TEXTURE_WIDTH.toFloat() / TEXTURE_HEIGHT.toFloat()
@@ -170,6 +181,8 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
      * draw the textured quads to the screen
      */
     override fun onDrawFrame(unused: GL10?) {
+
+        mRenderLock.lock()
 
         // Draw the left side
         drawSceneToFrameBuffer(mLeftCamera,
@@ -198,6 +211,8 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
         // draw the quad with the generated textures.
         mLeftQuad.draw(identityMatrix, mRenderTexture[LEFT_FRAMEBUFFER_INDEX])
         mRightQuad.draw(identityMatrix, mRenderTexture[RIGHT_FRAMEBUFFER_INDEX])
+
+        mRenderLock.unlock()
     }
 
     /**
@@ -256,11 +271,11 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
         // create a view projection matrix
         Matrix.multiplyMM(viewProjectionMatrix, 0, mProjectionMatrix, 0, viewMatrix, 0)
 
+        // render the scene
         mScene.draw(viewProjectionMatrix,
             mSunLight.getSunPosition(),       // light position
             mSunLight.getLightColour(),        // light colour
-            Triple(camera.getPosition().X(), camera.getPosition().Y(), camera.getPosition().Z())
-            )
+            Triple(camera.getPosition().X(), camera.getPosition().Y(), camera.getPosition().Z()))
 
         // render the sun
         // set the light position as the camera position so that the sun is illuminated.
@@ -278,5 +293,21 @@ class VrRenderer(vis: PlayerVision, sky: SkyBox, sunLight: SunLight, scene: Draw
 
         // render the skybox
         mSkyBox.draw(skyboxViewProjectionMatrix, mSunLight.getLightColour())
+
+        // finally render the transparent object
+        mTransparentObject.draw(
+                viewProjectionMatrix,
+                mSunLight.getSunPosition(),       // light position
+                mSunLight.getLightColour(),        // light colour
+                Triple(camera.getPosition().X(), camera.getPosition().Y(), camera.getPosition().Z())
+        )
+    }
+
+    fun AquireLock() {
+        mRenderLock.lock()
+    }
+
+    fun ReleaseLock() {
+        mRenderLock.unlock()
     }
 }

@@ -6,11 +6,11 @@ class PlayerVision {
 
     private val PLAYER_Y: Float = 3.0f
 
-    private val mLeftEye = GameCamera(Position3Float(0.0f,3.0f,0.0f),
+    private val mLeftEye = GameCamera(Position3Float(0.0f,PLAYER_Y,0.0f),
         Vector3Float(0.0f, 0.0f, 1.0f),
         Vector3Float(0.0f, 1.0f, 0.0f))
 
-    private val mRightEye = GameCamera(Position3Float(0.0f,3.0f,0.0f),
+    private val mRightEye = GameCamera(Position3Float(0.0f,PLAYER_Y,0.0f),
         Vector3Float(0.0f, 0.0f, 1.0f),
         Vector3Float(0.0f, 1.0f, 0.0f))
 
@@ -18,6 +18,9 @@ class PlayerVision {
     private var mLookDistance = 100.0f
 
     private var mLookStraightAhead = true
+
+    private var mLookDirection = Vector3Float(0.0f, 0.0f, -1.0f)
+    private var mPlayerPosition = Position3Float(0.0f, PLAYER_Y, 0.0f)
 
     /**
      * get a copy of the left Eye
@@ -164,6 +167,12 @@ class PlayerVision {
                 lookUpDirectionMatrix.get(13),
                 lookUpDirectionMatrix.get(14))
         )
+
+        // set the variables used to determine where the player is looking on the y axis
+        mPlayerPosition = Position3Float(x, PLAYER_Y, z)
+        mLookDirection = Vector3Float(lookAtDirectionMatrix.get(12),
+            lookAtDirectionMatrix.get(13),
+            lookAtDirectionMatrix.get(14))
     }
 
     /**
@@ -190,5 +199,29 @@ class PlayerVision {
      */
     fun toggleCameraLookAt() {
         mLookStraightAhead = if (mLookStraightAhead) false else true
+    }
+
+    /**
+     * Gets the position on the 0 Y axis that the player is looking
+     */
+    fun GetPositionPlayerIsLookingOnTheYAxisPlane() : Pair<Boolean, Position3Float> {
+
+        // check the player is looking down
+        if ( mLookDirection.Y() < 0.0f ) {
+
+            val vectorToGround = Vector3Float(0.0f, -mPlayerPosition.Y(), 0.0f)
+
+            // get the angle between the two vectors
+            val angle = vectorToGround.AngleToVector(mLookDirection)
+
+            // now calculate the length of the look Direction required to contact the ground using pythagoras
+            val length = vectorToGround.getLength() / Math.cos(angle.toDouble())
+
+            val finalPos = mPlayerPosition + (mLookDirection.getNormalised() * length.toFloat())
+
+            return Pair(true, finalPos)
+        }
+
+        return Pair(false, Position3Float(0.0f, 0.0f, 0.0f))
     }
 }
