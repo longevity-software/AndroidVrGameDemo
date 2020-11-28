@@ -31,6 +31,27 @@ class ObjectPlacer(modelLoader: ModelLoader) : DrawableInterface {
     }
 
     /**
+     * Function to rotate the model to be placed
+     */
+    fun rotateObjectPlacer(adjust: Boolean, left_not_right: Boolean) {
+
+        mRenderLock.lock()
+
+        if ( ( adjust )
+            && ( mShowModel )
+            && ( mTransparentModel != null ) ) {
+
+            if ( left_not_right ) {
+                mTransparentModel!!.adjustYRotation(1.0f)
+            } else {
+                mTransparentModel!!.adjustYRotation(-1.0f)
+            }
+        }
+
+        mRenderLock.unlock()
+    }
+
+    /**
      * function to change the model being placed
      */
     fun setModelToBePlaced(model: String) {
@@ -97,5 +118,15 @@ class ObjectPlacer(modelLoader: ModelLoader) : DrawableInterface {
         mRenderLock.unlock()
     }
 
+    fun getModelName() : String {
+        return mModelName + ".obj"
+    }
 
+    fun getModelPosition() : Position3Float {
+        return mTransparentModel!!.getPosition()
+    }
+
+    fun getModelRotation() : Float {
+        return mTransparentModel!!.getYRotation()
+    }
 }

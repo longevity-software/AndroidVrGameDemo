@@ -32,9 +32,9 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     private var mRollAngle: Float   // there is no roll delta as the xbox controller doesn't change this value
 
     // buttons
-    private var mActionButtonPressed: Boolean
-    private var mR1ButtonPressed: Boolean
-    private var mL1ButtonPressed: Boolean
+    private var mActionButtonState: ButtonControlInterface.ButtonState
+    private var mR1ButtonState: ButtonControlInterface.ButtonState
+    private var mL1ButtonState: ButtonControlInterface.ButtonState
 
     /**
      * init function initialises the translation and rotation matrices to an identity matrix.
@@ -52,9 +52,9 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         mLeftRightDelta = 0.0f
 
         // buttons are initially not pressed
-        mActionButtonPressed = false
-        mR1ButtonPressed = false
-        mL1ButtonPressed = false
+        mActionButtonState = ButtonControlInterface.ButtonState.IDLE
+        mR1ButtonState = ButtonControlInterface.ButtonState.IDLE
+        mL1ButtonState = ButtonControlInterface.ButtonState.IDLE
     }
 
     /**
@@ -149,57 +149,72 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
      *  Overridden function from the ButtonControlInterface
      *  returns the current state of the action button.
      */
-    override fun isActionButtonPressed() : Boolean {
+    override fun getActionButtonState() : ButtonControlInterface.ButtonState {
 
         // lock while we use the action button pressed variable
         mButtonLock.lock()
 
-        // take a copy of the action button state and then reset it.
-        val isPressed = mActionButtonPressed
-        mActionButtonPressed = false
+        // take a copy of the action button state and then adjust if it is a transitionary state.
+        val state = mActionButtonState
+
+        if ( ButtonControlInterface.ButtonState.PRESSED == mActionButtonState ) {
+            mActionButtonState = ButtonControlInterface.ButtonState.HELD
+        } else if ( ButtonControlInterface.ButtonState.RELEASED == mActionButtonState ) {
+            mActionButtonState = ButtonControlInterface.ButtonState.IDLE
+        }
 
         // unlock
         mButtonLock.unlock()
 
-        return isPressed
+        return state
     }
 
     /**
      *  Overridden function from the ButtonControlInterface
      *  returns the current state of the R1 button.
      */
-    override fun IsR1ButtonPressed() : Boolean {
+    override fun getR1ButtonState() : ButtonControlInterface.ButtonState {
 
         // lock while we use the R1 button pressed variable
         mButtonLock.lock()
 
-        // take a copy of the R1 button state and then reset it.
-        val isPressed = mR1ButtonPressed
-        mR1ButtonPressed = false
+        // take a copy of the R1 button state and then adjust if it is a transitionary state.
+        val state = mR1ButtonState
+
+        if ( ButtonControlInterface.ButtonState.PRESSED == mR1ButtonState ) {
+            mR1ButtonState = ButtonControlInterface.ButtonState.HELD
+        } else if ( ButtonControlInterface.ButtonState.RELEASED == mR1ButtonState ) {
+            mR1ButtonState = ButtonControlInterface.ButtonState.IDLE
+        }
 
         // unlock
         mButtonLock.unlock()
 
-        return isPressed
+        return state
     }
 
     /**
      *  Overridden function from the ButtonControlInterface
      *  returns the current state of the L1 button.
      */
-    override fun IsL1ButtonPressed() : Boolean {
+    override fun getL1ButtonState() : ButtonControlInterface.ButtonState {
 
         // lock while we use the L1 button pressed variable
         mButtonLock.lock()
 
-        // take a copy of the L1 button state and then reset it.
-        val isPressed = mL1ButtonPressed
-        mL1ButtonPressed = false
+        // take a copy of the L1 button state and then adjust if it is a transitionary state.
+        val state = mL1ButtonState
+
+        if ( ButtonControlInterface.ButtonState.PRESSED == mL1ButtonState ) {
+            mL1ButtonState = ButtonControlInterface.ButtonState.HELD
+        } else if ( ButtonControlInterface.ButtonState.RELEASED == mL1ButtonState ) {
+            mL1ButtonState = ButtonControlInterface.ButtonState.IDLE
+        }
 
         // unlock
         mButtonLock.unlock()
 
-        return isPressed
+        return state
     }
 
     /**
@@ -223,7 +238,7 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                             // lock while the Action button state is updated
                             mButtonLock.lock()
 
-                            mActionButtonPressed = true
+                            mActionButtonState = ButtonControlInterface.ButtonState.PRESSED
 
                             // unlock
                             mButtonLock.unlock()
@@ -231,7 +246,7 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                         KeyEvent.KEYCODE_BUTTON_R1 -> {
                             mButtonLock.lock()
 
-                            mR1ButtonPressed = true
+                            mR1ButtonState = ButtonControlInterface.ButtonState.PRESSED
 
                             mButtonLock.unlock()
                         }
@@ -239,7 +254,7 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                         KeyEvent.KEYCODE_BUTTON_L1 -> {
                             mButtonLock.lock()
 
-                            mL1ButtonPressed = true
+                            mL1ButtonState = ButtonControlInterface.ButtonState.PRESSED
 
                             mButtonLock.unlock()
                         }
@@ -253,6 +268,59 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         }
 
         return keyDownHasBeenHandled
+    }
+
+    /**
+     * Function to be called from the main activity/view's onKeyUp function.
+     */
+    fun onKeyUp(keyCode: Int, event: KeyEvent?) : Boolean {
+
+        var keyUpHasBeenHandled = false
+
+        // confirm the event is not null and the input device is a gamepad
+        if ( null != event ) {
+            if ( InputDevice.SOURCE_GAMEPAD == ( event.source and InputDevice.SOURCE_GAMEPAD ) ) {
+                if ( 0 == event.repeatCount ) {
+
+                    // we have got here so majority of situations should handle the event
+                    keyUpHasBeenHandled = true
+
+                    // process the key released
+                    when ( keyCode ) {
+                        KeyEvent.KEYCODE_BUTTON_A -> {
+                            // lock while the Action button state is updated
+                            mButtonLock.lock()
+
+                            mActionButtonState = ButtonControlInterface.ButtonState.RELEASED
+
+                            // unlock
+                            mButtonLock.unlock()
+                        }
+                        KeyEvent.KEYCODE_BUTTON_R1 -> {
+                            mButtonLock.lock()
+
+                            mR1ButtonState = ButtonControlInterface.ButtonState.RELEASED
+
+                            mButtonLock.unlock()
+                        }
+
+                        KeyEvent.KEYCODE_BUTTON_L1 -> {
+                            mButtonLock.lock()
+
+                            mL1ButtonState = ButtonControlInterface.ButtonState.RELEASED
+
+                            mButtonLock.unlock()
+                        }
+                        else -> {
+                            // no other keycodes are currently processed
+                            keyUpHasBeenHandled = false
+                        }
+                    }
+                }
+            }
+        }
+
+        return keyUpHasBeenHandled
     }
 
     /**

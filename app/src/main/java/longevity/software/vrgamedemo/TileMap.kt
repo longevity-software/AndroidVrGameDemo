@@ -14,6 +14,18 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
     private val TILE_SIZE : Float = 20.0f
     private val HALF_TILE_SIZE = TILE_SIZE / 2.0f
 
+    private val mTileOffsets = arrayOf(
+        Position3Float(-TILE_SIZE, 0.0f, -TILE_SIZE),
+        Position3Float(0.0f, 0.0f, -TILE_SIZE),
+        Position3Float(TILE_SIZE, 0.0f, -TILE_SIZE),
+        Position3Float(-TILE_SIZE, 0.0f, 0.0f),
+        Position3Float(0.0f, 0.0f, 0.0f),
+        Position3Float(TILE_SIZE, 0.0f, 0.0f),
+        Position3Float(-TILE_SIZE, 0.0f, TILE_SIZE),
+        Position3Float(0.0f, 0.0f, TILE_SIZE),
+        Position3Float(TILE_SIZE, 0.0f, TILE_SIZE)
+    )
+
     private var mTiles = Array<Tile?>(9) {null}
 
     private val mModelLoader = modelLoader
@@ -44,20 +56,10 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
      */
     override fun initialise() {
 
-        val offsets = arrayOf(Pair(-TILE_SIZE, -TILE_SIZE),
-            Pair(0.0f, -TILE_SIZE),
-            Pair(TILE_SIZE, -TILE_SIZE),
-            Pair(-TILE_SIZE, 0.0f),
-            Pair(0.0f, 0.0f),
-            Pair(TILE_SIZE, 0.0f),
-            Pair(-TILE_SIZE, TILE_SIZE),
-            Pair(0.0f, TILE_SIZE),
-            Pair(TILE_SIZE, TILE_SIZE))
-
         // add all the models to the arraylist of model data
         for (i in 0 until NUMBER_OF_TILES) {
             mTiles[i]?.initialise()
-            mTiles[i]?.setTileOffset(offsets[i].first, offsets[i].second)
+            mTiles[i]?.setTileOffset(mTileOffsets[i].X(), mTileOffsets[i].Z())
         }
     }
 
@@ -236,7 +238,7 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
                     // create variables used later
                     var nextTile = currentTile
-                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+                    var offset: Position3Float
 
                     // check for identical distances
                     if ( upDistance == rightDistance ) {
@@ -301,7 +303,7 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
                     // create variables used later
                     var nextTile = currentTile
-                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+                    var offset: Position3Float
 
                     // check for identical distances
                     if ( upDistance == leftDistance ) {
@@ -366,7 +368,7 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
                     // create variables used later
                     var nextTile = currentTile
-                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+                    var offset: Position3Float
 
                     // check for identical distances
                     if ( downDistance == rightDistance ) {
@@ -431,7 +433,7 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
                     // create variables used later
                     var nextTile = currentTile
-                    var offset = Position3Float(0.0f, 0.0f, 0.0f)
+                    var offset: Position3Float
 
                     // check for identical distances
                     if ( downDistance == leftDistance ) {
@@ -504,21 +506,9 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
             mTiles[7] = VrTileFormatParser(mContext, mTiles[CENTER_TILE_INDEX]!!.getTileStraightDown(), mModelLoader).getParsedTile()
             mTiles[8] = VrTileFormatParser(mContext, mTiles[CENTER_TILE_INDEX]!!.getTileDownRight(), mModelLoader).getParsedTile()
 
-            val offsets = arrayOf(
-                Pair(-TILE_SIZE, -TILE_SIZE),
-                Pair(0.0f, -TILE_SIZE),
-                Pair(TILE_SIZE, -TILE_SIZE),
-                Pair(-TILE_SIZE, 0.0f),
-                Pair(0.0f, 0.0f),
-                Pair(TILE_SIZE, 0.0f),
-                Pair(-TILE_SIZE, TILE_SIZE),
-                Pair(0.0f, TILE_SIZE),
-                Pair(TILE_SIZE, TILE_SIZE)
-            )
-
             // tiles have shifted so reset the offsets
             for (i in 0 until NUMBER_OF_TILES) {
-                mTiles[i]?.setTileOffset(offsets[i].first, offsets[i].second)
+                mTiles[i]?.setTileOffset(mTileOffsets[i].X(), mTileOffsets[i].Z())
             }
         }
 
@@ -571,5 +561,75 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
         // TODO - check for Zero divisor
         return Position3Float((intersectionXNumerator / intersectionDivisor), 0.0f, (intersectionYNumerator / intersectionDivisor))
+    }
+
+    /**
+     * Function which determines which tile to place the object and then add it to that tile.
+     */
+    fun placeObjectInMap(modelName: String, pos: Position3Float, rot: Float) {
+
+        // find out which tile the object is in
+        // double check it is on the tile map
+        if ( isPositionValidOnTileMap(pos) ) {
+
+            val TOP_ROW = 0x01
+            val CENTER_ROW = 0x02
+            val BOTTOM_ROW = 0x04
+            val LEFT_COLUMN = 0x08
+            val CENTER_COLUMN = 0x10
+            val RIGHT_COLUMN = 0x20
+
+            var tileBits = 0x00
+
+            // now which tile is it in
+            if (pos.X() > HALF_TILE_SIZE) {
+                tileBits = tileBits or RIGHT_COLUMN
+            } else if (pos.X() < -HALF_TILE_SIZE) {
+                tileBits = tileBits or LEFT_COLUMN
+            } else {
+                tileBits = tileBits or CENTER_COLUMN
+            }
+
+            if (pos.Z() > HALF_TILE_SIZE) {
+                tileBits = tileBits or BOTTOM_ROW
+            } else if (pos.Z() < -HALF_TILE_SIZE) {
+                tileBits = tileBits or TOP_ROW
+            } else {
+                tileBits = tileBits or CENTER_ROW
+            }
+
+            var tileIndex = CENTER_TILE_INDEX
+
+            when (tileBits) {
+                ( TOP_ROW or LEFT_COLUMN ) -> {
+                    tileIndex = 0
+                }
+                ( TOP_ROW or CENTER_COLUMN ) -> {
+                    tileIndex = 1
+                }
+                ( TOP_ROW or RIGHT_COLUMN ) -> {
+                    tileIndex = 2
+                }
+                ( CENTER_ROW or LEFT_COLUMN ) -> {
+                    tileIndex = 3
+                }
+                ( CENTER_ROW or RIGHT_COLUMN ) -> {
+                    tileIndex = 5
+                }
+                ( BOTTOM_ROW or LEFT_COLUMN ) -> {
+                    tileIndex = 6
+                }
+                ( BOTTOM_ROW or CENTER_COLUMN ) -> {
+                    tileIndex = 7
+                }
+                ( BOTTOM_ROW or RIGHT_COLUMN ) -> {
+                    tileIndex = 8
+                }
+            }
+
+            val positionOnTile = pos - mTileOffsets[tileIndex]
+
+            mTiles[tileIndex]!!.addModel(modelName, positionOnTile, rot)
+        }
     }
 }

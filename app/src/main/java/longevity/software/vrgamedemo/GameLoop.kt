@@ -1,5 +1,7 @@
 package longevity.software.vrgamedemo
 
+import android.util.Log
+
 class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, player: Player, sun: SunLight, vision: PlayerVision, tileMap: TileMap, objectPlacer: ObjectPlacer): Runnable {
 
     private val MILLISECONDS_IN_A_DAY = 240000
@@ -24,6 +26,8 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
 
         while ( mRunning ) {
 
+            val start_time = System.currentTimeMillis()
+
             // gain render lock while we are adjusting the scene
             mScene.AquireRenderLock()
 
@@ -40,43 +44,51 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
 
             mObjectPlacer.adjustObjectPlacer(playerLookingAtGround.second, showObjectPlacer)
 
-            if (mControlHub.isR1ButtonPressed()) {
-                mPlayerVision.increaseEyeDistance(0.1f)
-            }
-
-            if (mControlHub.isL1ButtonPressed()) {
-                mPlayerVision.decreaseEyeDistance(0.1f)
-            }
-
-            if (mControlHub.isActionButtonPressed()) {
-                //mPlayerVision.toggleCameraLookAt()
-                when (mTemp) {
-                    0 -> {
-                        mObjectPlacer.setModelToBePlaced("Tree")
-                        mTemp = 1
-                    }
-                    1 -> {
-                        mObjectPlacer.setModelToBePlaced("Rocks")
-                        mTemp = 2
-                    }
-                    else -> {
-                        mObjectPlacer.resetModelToBePlaced()
-                        mTemp = 0
-                    }
+            mControlHub.getR1ButtonState().also {
+                if ( ( ButtonControlInterface.ButtonState.PRESSED == it )
+                    || ( ButtonControlInterface.ButtonState.HELD == it ) ) {
+                    //mPlayerVision.increaseEyeDistance(0.1f)
+                    mObjectPlacer.rotateObjectPlacer(true, true)
                 }
+            }
 
+            mControlHub.getL1ButtonState().also {
+                if ((ButtonControlInterface.ButtonState.PRESSED == it)
+                    || (ButtonControlInterface.ButtonState.HELD == it)
+                ) {
+                    //mPlayerVision.decreaseEyeDistance(0.1f)
+                    mObjectPlacer.rotateObjectPlacer(true, false)
+                }
+            }
+
+            if ( ButtonControlInterface.ButtonState.PRESSED == mControlHub.getActionButtonState() ) {
+                mTileMap.placeObjectInMap(mObjectPlacer.getModelName(),
+                                            mObjectPlacer.getModelPosition(),
+                                            mObjectPlacer.getModelRotation())
             }
 
             val TIME = (System.currentTimeMillis() % MILLISECONDS_IN_A_DAY).toFloat()
             val TIME_OF_DAY = (TIME / MILLISECONDS_IN_A_DAY.toFloat())
 
-            mSunLight.UpdateSunLight(0.5f, mPlayer.getPosition())
+            mSunLight.UpdateSunLight(TIME_OF_DAY, mPlayer.getPosition())
 
             // render the scene
             mScene.ReleasLockAndRenderTheScene()
 
-            // sleep for 25mS
-            Thread.sleep(25)
+            val end_time = System.currentTimeMillis()
+
+            // if the elapsed time is less than the desired fps then wait the remainder
+            // else just continue as we are too slow
+            if ((end_time - start_time) < 25) {
+                try {
+                    Thread.sleep(25 - (end_time - start_time))
+                } catch (e: Exception) {
+                    Log.d("[Thread.Sleep]", "GA $e")
+                }
+            }
+            else {
+                Log.d("[Frame Time]", (end_time - start_time).toString())
+            }
         }
     }
 

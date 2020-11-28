@@ -120,6 +120,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Overridden onKeyUp function which calls the XboxController class's onKeyDown function to process the event
+     */
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+
+        if ( true == mXboxController.onKeyUp(keyCode, event) ) {
+            return true
+        }
+        else {
+            return super.onKeyUp(keyCode, event)
+        }
+    }
+
+    /**
      * Overridden onGenericMotionEvent function which calls the
      * XboxController class's onGenericMotionEvent function to process the event
      */

@@ -129,6 +129,18 @@ class Tile(baseModel: String,
     }
 
     /**
+     * adds a model to the tile
+     */
+    fun addModel(modelName: String, pos: Position3Float, rot: Float) {
+
+        val gameObjectData = Triple(modelName, pos, rot)
+
+        mGameOjectData.add(gameObjectData)
+
+        mModelsHaveNotBeenInitialised = true
+    }
+
+    /**
      *  returns a null checked string representing the tile Name
      */
     fun getTileName() : String {

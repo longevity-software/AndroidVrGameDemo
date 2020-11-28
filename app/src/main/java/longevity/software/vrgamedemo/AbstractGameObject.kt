@@ -486,4 +486,18 @@ abstract class AbstractGameObject() {
     fun setYRotation(rot: Float) {
         mRotation = rot
     }
+
+    /**
+     * function to adjust the Y rotation
+     */
+    fun adjustYRotation(delta: Float) {
+        mRotation += delta
+    }
+
+    /**
+     * function to get the Y rotation
+     */
+    fun getYRotation() : Float {
+        return mRotation
+    }
 }

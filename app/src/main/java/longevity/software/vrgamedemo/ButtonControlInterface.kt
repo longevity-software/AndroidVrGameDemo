@@ -2,7 +2,14 @@ package longevity.software.vrgamedemo
 
 interface ButtonControlInterface {
 
-    fun isActionButtonPressed() : Boolean
-    fun IsL1ButtonPressed() : Boolean
-    fun IsR1ButtonPressed() : Boolean
+    enum class ButtonState {
+        IDLE,
+        PRESSED,
+        HELD,
+        RELEASED
+    }
+
+    fun getActionButtonState() : ButtonState
+    fun getL1ButtonState() : ButtonState
+    fun getR1ButtonState() : ButtonState
 }
