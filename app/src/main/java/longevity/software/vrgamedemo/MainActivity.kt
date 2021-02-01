@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mSunLight: SunLight
     private lateinit var mTileMap: TileMap
     private lateinit var mObjectPlacer: ObjectPlacer
+    private lateinit var mSaveDatabase: SaveProgressInterface
 
     /**
      * function called when the Main activity is created.
@@ -64,8 +65,12 @@ class MainActivity : AppCompatActivity() {
         // initialise the sunlight
         mSunLight = SunLight(mModelLoader)
 
+        val db = DatabaseHelper(this)
+
+        mSaveDatabase = db
+
         // initialise the tile map
-        mTileMap = TileMap(this, mModelLoader)
+        mTileMap = TileMap(this, mModelLoader, mSaveDatabase)
 
          // initialise the object placer
         mObjectPlacer = ObjectPlacer(mModelLoader)

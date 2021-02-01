@@ -2,7 +2,7 @@ package longevity.software.vrgamedemo
 
 import android.content.Context
 
-class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, PlayerPositionTileMapInterface {
+class TileMap(context: Context, modelLoader: ModelLoader, save: SaveProgressInterface) : DrawableInterface, PlayerPositionTileMapInterface {
 
     private val NUMBER_OF_TILES = 9
     private val CENTER_TILE_INDEX = 4
@@ -32,13 +32,17 @@ class TileMap(context: Context, modelLoader: ModelLoader) : DrawableInterface, P
 
     private val mContext = context
 
+    private val mSave = save
+
     /**
      * Initialise the tiles to default ones for now
      */
     init {
 
+        val tile = mSave.getTile()
+
         // set the center tile
-        mTiles[CENTER_TILE_INDEX] = VrTileFormatParser(mContext, "Tile_0_0.vtf", modelLoader).getParsedTile()
+        mTiles[CENTER_TILE_INDEX] = VrTileFormatParser(mContext, tile, modelLoader).getParsedTile()
 
         // set the other tiles
         mTiles[0] = VrTileFormatParser(mContext, mTiles[CENTER_TILE_INDEX]!!.getTileUpLeft(), modelLoader).getParsedTile()

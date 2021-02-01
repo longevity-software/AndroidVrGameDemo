@@ -5,7 +5,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import java.util.concurrent.locks.ReentrantLock
 
-class XboxController(): MoveControlInterface, LookControlInterface, ButtonControlInterface {
+class XboxController(): MoveControlInterface, LookControlInterface, ButtonControlInterface, DPadControlInterface {
 
     // locks to prevent the rotation or translation matrices from being read and written to at the same time
     private val mRotationLock = ReentrantLock()
@@ -213,6 +213,45 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
 
         // unlock
         mButtonLock.unlock()
+
+        return state
+    }
+
+    /**
+     *  Overridden function from the DPadControlInterface
+     *  returns the current state of the direction pad or left stick.
+     */
+    override fun getDpadState(): DPadControlInterface.DpadState {
+        val DELTA_THRESHOLD = 0.02
+        var state = DPadControlInterface.DpadState.NO_DIRECTION
+
+        if (mForwardBackDelta <= -DELTA_THRESHOLD) {
+            // we are going up but are we going left or right as well
+            if (mLeftRightDelta >= DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.UP_LEFT_DIRECTION
+            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.UP_RIGHT_DIRECTION
+            } else {
+                state = DPadControlInterface.DpadState.UP_DIRECTION
+            }
+        } else if (mForwardBackDelta >= DELTA_THRESHOLD) {
+            // we are going down but are we going left or right as well
+            if (mLeftRightDelta >= DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.DOWN_LEFT_DIRECTION
+            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.DOWN_RIGHT_DIRECTION
+            } else {
+                state = DPadControlInterface.DpadState.DOWN_DIRECTION
+            }
+        }
+        else {
+            // not moving forwards of backwards so are we going left or right
+            if (mLeftRightDelta >= DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.LEFT_DIRECTION
+            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.RIGHT_DIRECTION
+            }
+        }
 
         return state
     }
