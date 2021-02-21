@@ -70,7 +70,7 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
             val TIME = (System.currentTimeMillis() % MILLISECONDS_IN_A_DAY).toFloat()
             val TIME_OF_DAY = (TIME / MILLISECONDS_IN_A_DAY.toFloat())
 
-            mSunLight.UpdateSunLight(TIME_OF_DAY, mPlayer.getPosition())
+            mSunLight.UpdateSunLight(0.5f, mPlayer.getPosition())
 
             // render the scene
             mScene.ReleasLockAndRenderTheScene()

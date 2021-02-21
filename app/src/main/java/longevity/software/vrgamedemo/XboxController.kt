@@ -228,18 +228,18 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         if (mForwardBackDelta <= -DELTA_THRESHOLD) {
             // we are going up but are we going left or right as well
             if (mLeftRightDelta >= DELTA_THRESHOLD) {
-                state = DPadControlInterface.DpadState.UP_LEFT_DIRECTION
-            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
                 state = DPadControlInterface.DpadState.UP_RIGHT_DIRECTION
+            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.UP_LEFT_DIRECTION
             } else {
                 state = DPadControlInterface.DpadState.UP_DIRECTION
             }
         } else if (mForwardBackDelta >= DELTA_THRESHOLD) {
             // we are going down but are we going left or right as well
             if (mLeftRightDelta >= DELTA_THRESHOLD) {
-                state = DPadControlInterface.DpadState.DOWN_LEFT_DIRECTION
-            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
                 state = DPadControlInterface.DpadState.DOWN_RIGHT_DIRECTION
+            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.DOWN_LEFT_DIRECTION
             } else {
                 state = DPadControlInterface.DpadState.DOWN_DIRECTION
             }
@@ -247,9 +247,9 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
         else {
             // not moving forwards of backwards so are we going left or right
             if (mLeftRightDelta >= DELTA_THRESHOLD) {
-                state = DPadControlInterface.DpadState.LEFT_DIRECTION
-            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
                 state = DPadControlInterface.DpadState.RIGHT_DIRECTION
+            } else if (mLeftRightDelta <= -DELTA_THRESHOLD) {
+                state = DPadControlInterface.DpadState.LEFT_DIRECTION
             }
         }
 

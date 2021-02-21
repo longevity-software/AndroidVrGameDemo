@@ -7,6 +7,7 @@
     <color name="black_overlay">#66000000</color>
 
     <color name="active_button_colour">#FFFF00</color>
+    <color name="active_unslectable_button_colour">#7F7F00</color>
     <color name="inactive_button_colour">#3F7F7F</color>
 
 </resources>

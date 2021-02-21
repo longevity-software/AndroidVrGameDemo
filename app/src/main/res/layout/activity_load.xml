@@ -3,52 +3,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    tools:context=".MenuActivity"
+    android:background="@color/colorPrimary"
+    tools:context=".LoadActivity"
     android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@color/inactive_button_colour"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text=""/>
-
-        <TextView
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
+            android:text=""
             android:layout_weight="1"
             android:gravity="center"
-            android:id="@+id/leftNewButton"
-            android:text="New Game"/>
+            android:autoSizeTextType="uniform"
+            android:id="@+id/leftTopLoad"
+            android:background="@color/inactive_button_colour"/>
 
         <TextView
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:text=""
             android:gravity="center"
-            android:id="@+id/leftLoadButton"
-            android:text="Load Game"/>
+            android:autoSizeTextType="uniform"
+            android:id="@+id/leftMidLoad"
+            android:background="@color/inactive_button_colour"/>
 
         <TextView
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:text=""
             android:gravity="center"
-            android:id="@+id/leftSettingsButton"
-            android:text="Settings"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text=""/>
+            android:autoSizeTextType="uniform"
+            android:id="@+id/leftBotLoad"
+            android:background="@color/inactive_button_colour"/>
 
     </LinearLayout>
 
@@ -56,44 +49,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@color/inactive_button_colour"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text=""/>
-
-        <TextView
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
+            android:text=""
             android:gravity="center"
-            android:id="@+id/rightNewButton"
-            android:text="New Game"/>
+            android:autoSizeTextType="uniform"
+            android:id="@+id/rightTopLoad"
+            android:background="@color/inactive_button_colour"/>
 
         <TextView
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:text=""
             android:gravity="center"
-            android:id="@+id/rightLoadButton"
-            android:text="Load Game"/>
+            android:autoSizeTextType="uniform"
+            android:id="@+id/rightMidLoad"
+            android:background="@color/inactive_button_colour"/>
 
         <TextView
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:text=""
             android:gravity="center"
-            android:id="@+id/rightSettingsButton"
-            android:text="Settings"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text=""/>
+            android:autoSizeTextType="uniform"
+            android:id="@+id/rightBotLoad"
+            android:background="@color/inactive_button_colour"/>
 
     </LinearLayout>
 

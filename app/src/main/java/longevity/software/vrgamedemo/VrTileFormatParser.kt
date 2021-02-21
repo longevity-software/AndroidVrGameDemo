@@ -1,16 +1,16 @@
 package longevity.software.vrgamedemo
 
 import android.content.Context
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoader) {
 
     private var mTile: Tile
 
     init {
-        val inStream = context.assets.open(file)
-        val reader = BufferedReader(InputStreamReader(inStream))
+        //val inStream = context.assets.open(file)
+        //val reader = BufferedReader(InputStreamReader(inStream))
+
+        val reader = context.openFileInput(file).bufferedReader()
 
         // all the variables for creating a tile
         var baseModel = ""

@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mSunLight: SunLight
     private lateinit var mTileMap: TileMap
     private lateinit var mObjectPlacer: ObjectPlacer
-    private lateinit var mSaveDatabase: SaveProgressInterface
+    private lateinit var mLoadDatabase: LoadProgressInterface
 
     /**
      * function called when the Main activity is created.
@@ -56,8 +56,14 @@ class MainActivity : AppCompatActivity() {
                     BitmapFactory.decodeResource(getResources(), R.drawable.top),
                     BitmapFactory.decodeResource(getResources(), R.drawable.bottom))
 
+        // initialise the database so it can be used to load the game
+        mLoadDatabase = DatabaseHelper(this)
+        // and get the name of the save file passed in
+        val intent = getIntent()
+        val saveName = intent.getStringExtra("save_name")
+
         // initialise the player instance
-        mPlayer = Player(Position3Float(0.0f, 1.0f, 0.0f), mPlayerVision)
+        mPlayer = Player(mLoadDatabase.getPlayerOffset(saveName), mPlayerVision)
 
         // load all the models
         mModelLoader = ModelLoader(this)
@@ -65,12 +71,8 @@ class MainActivity : AppCompatActivity() {
         // initialise the sunlight
         mSunLight = SunLight(mModelLoader)
 
-        val db = DatabaseHelper(this)
-
-        mSaveDatabase = db
-
         // initialise the tile map
-        mTileMap = TileMap(this, mModelLoader, mSaveDatabase)
+        mTileMap = TileMap(this, mModelLoader, mLoadDatabase.getTile(saveName))
 
          // initialise the object placer
         mObjectPlacer = ObjectPlacer(mModelLoader)

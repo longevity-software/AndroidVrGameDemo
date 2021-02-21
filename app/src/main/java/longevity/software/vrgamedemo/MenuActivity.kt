@@ -1,11 +1,14 @@
 package longevity.software.vrgamedemo
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.io.File
+
 
 class MenuActivity : AppCompatActivity() {
 
@@ -21,10 +24,11 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var mRightSettingsButton: TextView
 
     private lateinit var mXboxController: XboxController
+    private lateinit var mLoadGameDatabase: DatabaseHelper
 
     private var mMenuSelection = mNEW_GAME_SELECTED
+    private var mLoadGameSelectable = false
 
-    private lateinit var mMenuThread: Thread
     private var mRunThread = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,13 +51,109 @@ class MenuActivity : AppCompatActivity() {
         // initialise the xbox controller class.
         mXboxController = XboxController()
 
+        // get the load game database
+        mLoadGameDatabase = DatabaseHelper(this)
+
+        if ( mLoadGameDatabase.getSaves().size > 0 ) {
+            mLoadGameSelectable = true
+        }
+
         updateSelectedMenuItem()
 
-        var lastDpadState = DPadControlInterface.DpadState.NO_DIRECTION
-        val DPAD_REPEAT_TIME = 50
-        var dpadRepeatCounter = 0
+        // TODO - check for empty tile and save if not present.
+        val emptyTile = File(this.filesDir, "Empty_tile.vtf")
 
-        mMenuThread = Thread(Runnable {
+        if ( !emptyTile.exists() ) {
+
+            val modelLoader = ModelLoader(this)
+            // file doesn't exist so create it.
+
+            val tile = Tile(
+                modelLoader.TILE_EMPTY,
+                "None",
+                modelLoader,
+                "Empty_tile.vtf",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                0.0f,
+                ArrayList<Triple<String, Position3Float, Float>>()
+            ).also {
+                it.saveTileToFile(this)
+            }
+        }
+    }
+
+    private fun updateSelectedMenuItem() {
+
+        when(mMenuSelection) {
+            mNEW_GAME_SELECTED -> {
+                mRightNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
+                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
+
+                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+            }
+            mLOAD_GAME_SELECTED -> {
+
+                val loadButtonColour = if (mLoadGameSelectable) { R.color.active_button_colour } else { R.color.active_unslectable_button_colour }
+
+                mRightLoadButton.setBackgroundColor(resources.getColor(loadButtonColour))
+                mLeftLoadButton.setBackgroundColor(resources.getColor(loadButtonColour))
+
+                mRightNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+            }
+            mSETTINGS_SELECTED -> {
+                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
+                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
+
+                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mRightNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+            }
+            else -> {
+                mMenuSelection = mNEW_GAME_SELECTED
+
+                mRightNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
+                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
+
+                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
+            }
+        }
+    }
+
+    /**
+     * overridded onResume function needed to register listeners for the device rotation sensor.
+     */
+    override fun onResume() {
+        super.onResume()
+
+        mRunThread = true
+
+        if ( mLoadGameDatabase.getSaves().size > 0 ) {
+            mLoadGameSelectable = true
+        }
+
+        val menuThread = Thread(Runnable {
+
+            var lastDpadState = DPadControlInterface.DpadState.NO_DIRECTION
+            val DPAD_REPEAT_TIME = 50
+            var dpadRepeatCounter = 0
+
             while(mRunThread) {
 
                 val dpadState = mXboxController.getDpadState()
@@ -119,9 +219,16 @@ class MenuActivity : AppCompatActivity() {
                     when (mMenuSelection) {
                         mNEW_GAME_SELECTED -> {
 
+                            val switchActivityIntent =
+                                Intent(this, NewGameActivity::class.java)
+                            startActivity(switchActivityIntent)
                         }
                         mLOAD_GAME_SELECTED -> {
-
+                            if (mLoadGameSelectable) {
+                                val switchActivityIntent =
+                                    Intent(this, LoadActivity::class.java)
+                                startActivity(switchActivityIntent)
+                            }
                         }
                         mSETTINGS_SELECTED -> {
 
@@ -134,61 +241,8 @@ class MenuActivity : AppCompatActivity() {
                 Thread.sleep(10)
             }
         })
-    }
 
-    private fun updateSelectedMenuItem() {
-
-        when(mMenuSelection) {
-            mNEW_GAME_SELECTED -> {
-                mRightNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-
-                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-            }
-            mLOAD_GAME_SELECTED -> {
-                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-
-                mRightNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-            }
-            mSETTINGS_SELECTED -> {
-                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-
-                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mRightNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-            }
-            else -> {
-                mMenuSelection = mNEW_GAME_SELECTED
-
-                mRightNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-                mLeftNewButton.setBackgroundColor(resources.getColor(R.color.active_button_colour))
-
-                mRightLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftLoadButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mRightSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-                mLeftSettingsButton.setBackgroundColor(resources.getColor(R.color.inactive_button_colour))
-            }
-        }
-    }
-
-    /**
-     * overridded onResume function needed to register listeners for the device rotation sensor.
-     */
-    override fun onResume() {
-        super.onResume()
-
-        mRunThread = true
-
-        mMenuThread.start()
+        menuThread.start()
     }
 
     /**

@@ -2,7 +2,7 @@ package longevity.software.vrgamedemo
 
 import android.content.Context
 
-class TileMap(context: Context, modelLoader: ModelLoader, save: SaveProgressInterface) : DrawableInterface, PlayerPositionTileMapInterface {
+class TileMap(context: Context, modelLoader: ModelLoader, tile: String) : DrawableInterface, PlayerPositionTileMapInterface {
 
     private val NUMBER_OF_TILES = 9
     private val CENTER_TILE_INDEX = 4
@@ -32,14 +32,10 @@ class TileMap(context: Context, modelLoader: ModelLoader, save: SaveProgressInte
 
     private val mContext = context
 
-    private val mSave = save
-
     /**
      * Initialise the tiles to default ones for now
      */
     init {
-
-        val tile = mSave.getTile()
 
         // set the center tile
         mTiles[CENTER_TILE_INDEX] = VrTileFormatParser(mContext, tile, modelLoader).getParsedTile()
@@ -107,7 +103,7 @@ class TileMap(context: Context, modelLoader: ModelLoader, save: SaveProgressInte
         while ( (remainingDistance > 0.0f)
                 && (distanceTravelled > 0.0f) ){
 
-            // save as a val as it is used at the end of the loop
+            // load as a val as it is used at the end of the loop
             val tileFluidity = mTiles[currentTile]!!.getTileFluidity()
 
             // how far will we travel on the current tile
@@ -634,6 +630,9 @@ class TileMap(context: Context, modelLoader: ModelLoader, save: SaveProgressInte
             val positionOnTile = pos - mTileOffsets[tileIndex]
 
             mTiles[tileIndex]!!.addModel(modelName, positionOnTile, rot)
+
+            // change has been made so save it to file.
+            mTiles[tileIndex]!!.saveTileToFile(mContext)
         }
     }
 }

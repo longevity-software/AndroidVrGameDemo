@@ -1,5 +1,8 @@
 package longevity.software.vrgamedemo
 
+import android.content.Context
+import java.io.File
+
 class Tile(baseModel: String,
            baseRotation: String,
            modelLoader: ModelLoader,
@@ -291,5 +294,43 @@ class Tile(baseModel: String,
      */
     fun getTileFluidity() : Float {
         return mFluidity
+    }
+
+    /**
+     * Function used to save the tile to a file
+     */
+    fun saveTileToFile(context: Context) {
+
+        val file = File(context.filesDir, mTileName).also {
+
+            if ( it.exists() ) {
+                it.delete()
+            }
+        }
+
+        context.openFileOutput(mTileName, Context.MODE_PRIVATE).use {
+            it.write( ( "<BM>" + mBaseModel + "</BM>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<BR>" + mBaseRotation + "</BR>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<SU>" + getTileStraightUp() + "</SU>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<SD>" + getTileStraightDown() + "</SD>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<SL>" + getTileStraightLeft() + "</SL>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<SR>" + getTileStraightRight() + "</SR>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<UL>" + getTileUpLeft() + "</UL>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<UR>" + getTileUpRight() + "</UR>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<DL>" + getTileDownLeft() + "</DL>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<DR>" + getTileDownRight() + "</DR>" + System.lineSeparator() ).toByteArray() )
+            it.write( ( "<TF>" + mFluidity.toString() + "</TF>" + System.lineSeparator() ).toByteArray() )
+
+            // save any game objects
+            mGameOjectData.forEach { gameObject ->
+                it.write( ("<GO>" +
+                        gameObject.first + "," +
+                        gameObject.second.X().toString() + "," +
+                        gameObject.second.Y().toString() + "," +
+                        gameObject.second.Z().toString() + "," +
+                        gameObject.third.toString() + "</GO>" +
+                        System.lineSeparator() ).toByteArray() )
+            }
+        }
     }
 }
