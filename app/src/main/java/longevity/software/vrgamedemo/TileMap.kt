@@ -538,6 +538,262 @@ class TileMap(context: Context, modelLoader: ModelLoader, tile: String) : Drawab
     }
 
     /**
+     * function to return if the position is on an empty tile.
+     */
+    fun isPositionOnAnEmptyTile(pos: Position3Float) : Boolean {
+
+        val tileIndex = getIndexOfTileAtPosition(pos).also {
+            if (null != it) {
+                if (mTiles[it]!!.tileIsEmpty()) {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * function to bring the tile to life if it is empty
+     */
+    fun bringTileToLife(pos: Position3Float) {
+
+        val tileIndex = getIndexOfTileAtPosition(pos).also {
+            if (null != it) {
+
+                val tile = mTiles[it]!!
+                // tile is on the map so is it an empty tile
+                if (tile.tileIsEmpty()) {
+
+                    // get the tile prefix
+                    val tileName = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                    val tilePrefix = tileName.substringBefore("_")
+                    val tileX = tileName.substringBeforeLast("_").substringAfter("_").toInt()
+                    val tileY = tileName.substringAfterLast("_").substringBefore(".vtf").toInt()
+
+                    var newTileName = tilePrefix
+                    var newStraightUp = ""
+                    var newStraightDown = ""
+                    var newStraightLeft = ""
+                    var newStraightRight = ""
+                    var newUpLeft = ""
+                    var newUpRight = ""
+                    var newDownLeft = ""
+                    var newDownRight = ""
+
+                    when (it) {
+                        0 -> {
+                            newTileName += "_" + (tileX - 1).toString() + "_" + (tileY - 1).toString() + ".vtf"
+                            newStraightDown = mTiles[CENTER_TILE_INDEX]!!.getTileStraightLeft()
+                            newStraightRight = mTiles[CENTER_TILE_INDEX]!!.getTileStraightUp()
+                            newDownRight = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newUpRight = mTiles[1]!!.getTileStraightUp()
+                            newStraightUp = mTiles[1]!!.getTileUpLeft()
+                            newDownLeft = mTiles[3]!!.getTileStraightLeft()
+                            newStraightLeft = mTiles[3]!!.getTileUpLeft()
+
+                            if ("Empty_tile.vtf" != newStraightUp) {
+                                // parse the file to get the tile which is left of it
+                                val tempTile = VrTileFormatParser(mContext, newStraightUp, mModelLoader).getParsedTile()
+                                newUpLeft = tempTile.getTileStraightLeft()
+                            }
+                            else if ("Empty_tile.vtf" != newStraightLeft) {
+                                // parse the file to get the tile which is up from it
+                                val tempTile = VrTileFormatParser(mContext, newStraightLeft, mModelLoader).getParsedTile()
+                                newUpLeft = tempTile.getTileStraightUp()
+                            }
+                            else {
+                                newUpLeft = "Empty_tile.vtf"
+                            }
+                        }
+                        1 -> {
+                            newTileName += "_" + (tileX).toString() + "_" + (tileY - 1).toString() + ".vtf"
+                            newStraightDown = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newStraightRight = mTiles[CENTER_TILE_INDEX]!!.getTileUpRight()
+                            newDownRight = mTiles[CENTER_TILE_INDEX]!!.getTileStraightRight()
+                            newUpRight = mTiles[2]!!.getTileStraightUp()
+                            newStraightUp = if ("Empty_tile.vtf" == mTiles[2]!!.getTileUpLeft()) { mTiles[0]!!.getTileUpRight() } else {mTiles[2]!!.getTileUpLeft()}
+                            newDownLeft = mTiles[3]!!.getTileName()
+                            newStraightLeft = mTiles[0]!!.getTileName()
+                            newUpLeft = mTiles[0]!!.getTileStraightUp()
+                        }
+                        2 -> {
+                            newTileName += "_" + (tileX + 1).toString() + "_" + (tileY - 1).toString() + ".vtf"
+                            newStraightDown = mTiles[CENTER_TILE_INDEX]!!.getTileStraightRight()
+                            newStraightRight = mTiles[5]!!.getTileUpRight()
+                            newDownRight = mTiles[5]!!.getTileStraightRight()
+                            newUpLeft = mTiles[1]!!.getTileStraightUp()
+                            newStraightUp = mTiles[1]!!.getTileUpRight()
+                            newDownLeft = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newStraightLeft = mTiles[1]!!.getTileName()
+
+                            if ("Empty_tile.vtf" != newStraightUp) {
+                                // parse the file to get the tile which is left of it
+                                val tempTile = VrTileFormatParser(mContext, newStraightUp, mModelLoader).getParsedTile()
+                                newUpRight = tempTile.getTileStraightRight()
+                            }
+                            else if ("Empty_tile.vtf" != newStraightRight) {
+                                // parse the file to get the tile which is up from it
+                                val tempTile = VrTileFormatParser(mContext, newStraightRight, mModelLoader).getParsedTile()
+                                newUpRight = tempTile.getTileStraightUp()
+                            }
+                            else {
+                                newUpRight = "Empty_tile.vtf"
+                            }
+                        }
+                        3 -> {
+                            newTileName += "_" + (tileX - 1).toString() + "_" + (tileY).toString() + ".vtf"
+                            newStraightDown = mTiles[CENTER_TILE_INDEX]!!.getTileDownLeft()
+                            newStraightRight = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newDownRight = mTiles[CENTER_TILE_INDEX]!!.getTileStraightDown()
+                            newUpRight = mTiles[CENTER_TILE_INDEX]!!.getTileStraightUp()
+                            newStraightUp = mTiles[CENTER_TILE_INDEX]!!.getTileUpLeft()
+                            newDownLeft = mTiles[6]!!.getTileStraightLeft()
+                            newUpLeft = mTiles[0]!!.getTileStraightLeft()
+                            newStraightLeft = if ("Empty_tile.vtf" == mTiles[0]!!.getTileDownLeft()) { mTiles[6]!!.getTileUpLeft() } else {mTiles[0]!!.getTileDownLeft()}
+                        }
+                        5 -> {
+                            newTileName += "_" + (tileX + 1).toString() + "_" + (tileY).toString() + ".vtf"
+                            newStraightDown = mTiles[CENTER_TILE_INDEX]!!.getTileDownRight()
+                            newStraightLeft = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newDownRight = mTiles[8]!!.getTileStraightRight()
+                            newUpRight = mTiles[2]!!.getTileStraightRight()
+                            newStraightUp = mTiles[CENTER_TILE_INDEX]!!.getTileUpRight()
+                            newDownLeft = mTiles[CENTER_TILE_INDEX]!!.getTileStraightDown()
+                            newUpLeft = mTiles[CENTER_TILE_INDEX]!!.getTileStraightUp()
+                            newStraightRight = if ("Empty_tile.vtf" == mTiles[2]!!.getTileDownRight()) { mTiles[8]!!.getTileUpRight() } else {mTiles[2]!!.getTileDownRight()}
+                        }
+                        6 -> {
+                            newTileName += "_" + (tileX - 1).toString() + "_" + (tileY + 1).toString() + ".vtf"
+                            newStraightDown = mTiles[7]!!.getTileDownRight()
+                            newStraightRight = mTiles[CENTER_TILE_INDEX]!!.getTileStraightDown()
+                            newDownRight = mTiles[7]!!.getTileStraightDown()
+                            newUpLeft = mTiles[3]!!.getTileStraightLeft()
+                            newStraightUp = mTiles[CENTER_TILE_INDEX]!!.getTileStraightLeft()
+                            newStraightLeft = mTiles[3]!!.getTileDownLeft()
+                            newUpRight = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+
+                            if ("Empty_tile.vtf" != newStraightDown) {
+                                // parse the file to get the tile which is left of it
+                                val tempTile = VrTileFormatParser(mContext, newStraightDown, mModelLoader).getParsedTile()
+                                newDownLeft = tempTile.getTileStraightLeft()
+                            }
+                            else if ("Empty_tile.vtf" != newStraightLeft) {
+                                // parse the file to get the tile which is up from it
+                                val tempTile = VrTileFormatParser(mContext, newStraightLeft, mModelLoader).getParsedTile()
+                                newDownLeft = tempTile.getTileStraightDown()
+                            }
+                            else {
+                                newDownLeft = "Empty_tile.vtf"
+                            }
+                        }
+                        7 -> {
+                            newTileName += "_" + (tileX).toString() + "_" + (tileY + 1).toString() + ".vtf"
+                            newStraightLeft = mTiles[CENTER_TILE_INDEX]!!.getTileDownLeft()
+                            newDownRight = mTiles[8]!!.getTileStraightDown()
+                            newUpRight = mTiles[CENTER_TILE_INDEX]!!.getTileStraightRight()
+                            newStraightUp = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newDownLeft = mTiles[6]!!.getTileStraightDown()
+                            newUpLeft = mTiles[CENTER_TILE_INDEX]!!.getTileStraightLeft()
+                            newStraightRight = mTiles[CENTER_TILE_INDEX]!!.getTileDownRight()
+                            newStraightDown = if ("Empty_tile.vtf" == mTiles[6]!!.getTileDownRight()) { mTiles[8]!!.getTileDownLeft() } else {mTiles[6]!!.getTileDownRight()}
+                        }
+                        8 -> {
+                            newTileName += "_" + (tileX + 1).toString() + "_" + (tileY + 1).toString() + ".vtf"
+                            newStraightDown = mTiles[7]!!.getTileDownRight()
+                            newStraightRight = mTiles[5]!!.getTileDownRight()
+                            newUpRight = mTiles[5]!!.getTileStraightRight()
+                            newUpLeft = mTiles[CENTER_TILE_INDEX]!!.getTileName()
+                            newStraightUp = mTiles[CENTER_TILE_INDEX]!!.getTileStraightRight()
+                            newDownLeft = mTiles[7]!!.getTileStraightDown()
+                            newStraightLeft = mTiles[CENTER_TILE_INDEX]!!.getTileStraightDown()
+
+                            if ("Empty_tile.vtf" != newStraightDown) {
+                                // parse the file to get the tile which is left of it
+                                val tempTile = VrTileFormatParser(mContext, newStraightDown, mModelLoader).getParsedTile()
+                                newDownRight = tempTile.getTileStraightRight()
+                            }
+                            else if ("Empty_tile.vtf" != newStraightRight) {
+                                // parse the file to get the tile which is up from it
+                                val tempTile = VrTileFormatParser(mContext, newStraightRight, mModelLoader).getParsedTile()
+                                newDownRight = tempTile.getTileStraightDown()
+                            }
+                            else {
+                                newDownRight = "Empty_tile.vtf"
+                            }
+                        }
+                    }
+
+                    // now update all the new tiles neighbours to point to it
+                    if ( "Empty_tile.vtf" != newUpLeft ) {
+                        val tempTile = VrTileFormatParser(mContext, newUpLeft, mModelLoader).getParsedTile()
+                        tempTile.setTileDownRight(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newStraightUp ) {
+                        val tempTile = VrTileFormatParser(mContext, newStraightUp, mModelLoader).getParsedTile()
+                        tempTile.setTileStraightDown(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newUpRight ) {
+                        val tempTile = VrTileFormatParser(mContext, newUpRight, mModelLoader).getParsedTile()
+                        tempTile.setTileDownLeft(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newStraightLeft ) {
+                        val tempTile = VrTileFormatParser(mContext, newStraightLeft, mModelLoader).getParsedTile()
+                        tempTile.setTileStraightRight(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newStraightRight ) {
+                        val tempTile = VrTileFormatParser(mContext, newStraightRight, mModelLoader).getParsedTile()
+                        tempTile.setTileStraightLeft(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newDownLeft ) {
+                        val tempTile = VrTileFormatParser(mContext, newDownLeft, mModelLoader).getParsedTile()
+                        tempTile.setTileUpRight(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newStraightDown ) {
+                        val tempTile = VrTileFormatParser(mContext, newStraightDown, mModelLoader).getParsedTile()
+                        tempTile.setTileStraightUp(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+                    if ( "Empty_tile.vtf" != newDownRight ) {
+                        val tempTile = VrTileFormatParser(mContext, newDownRight, mModelLoader).getParsedTile()
+                        tempTile.setTileUpLeft(newTileName)
+                        tempTile.saveTileToFile(mContext)
+                    }
+
+                    val newTile = Tile(
+                        "Grass.obj",
+                        "None",
+                        mModelLoader,
+                        newTileName,
+                        newUpLeft,
+                        newStraightUp,
+                        newUpRight,
+                        newStraightLeft,
+                        newStraightRight,
+                        newDownLeft,
+                        newStraightDown,
+                        newDownRight,
+                        1.0f,
+                        ArrayList<Triple<String, Position3Float, Float>>()
+                    ).also {
+                        it.saveTileToFile(mContext)
+                    }
+
+                    newTile.setTileOffset(mTileOffsets[it]!!.X(), mTileOffsets[it]!!.Z())
+
+                    mTiles[it] = newTile
+                }
+            }
+        }
+    }
+
+    /**
      * Function to get the point that two lines intersect
      * Only call this function if the two lines are not parallel
      * TODO - Pass in and return new Position2Float instances
@@ -567,6 +823,21 @@ class TileMap(context: Context, modelLoader: ModelLoader, tile: String) : Drawab
      * Function which determines which tile to place the object and then add it to that tile.
      */
     fun placeObjectInMap(modelName: String, pos: Position3Float, rot: Float) {
+
+        val tileIndex = getIndexOfTileAtPosition(pos)
+
+        if ( null != tileIndex) {
+
+            val positionOnTile = pos - mTileOffsets[tileIndex]
+
+            mTiles[tileIndex]!!.addModel(modelName, positionOnTile, rot)
+
+            // change has been made so save it to file.
+            mTiles[tileIndex]!!.saveTileToFile(mContext)
+        }
+    }
+
+    private fun getIndexOfTileAtPosition(pos: Position3Float) : Int? {
 
         // find out which tile the object is in
         // double check it is on the tile map
@@ -598,41 +869,35 @@ class TileMap(context: Context, modelLoader: ModelLoader, tile: String) : Drawab
                 tileBits = tileBits or CENTER_ROW
             }
 
-            var tileIndex = CENTER_TILE_INDEX
-
             when (tileBits) {
-                ( TOP_ROW or LEFT_COLUMN ) -> {
-                    tileIndex = 0
+                (TOP_ROW or LEFT_COLUMN) -> {
+                    return 0
                 }
-                ( TOP_ROW or CENTER_COLUMN ) -> {
-                    tileIndex = 1
+                (TOP_ROW or CENTER_COLUMN) -> {
+                    return 1
                 }
-                ( TOP_ROW or RIGHT_COLUMN ) -> {
-                    tileIndex = 2
+                (TOP_ROW or RIGHT_COLUMN) -> {
+                    return 2
                 }
-                ( CENTER_ROW or LEFT_COLUMN ) -> {
-                    tileIndex = 3
+                (CENTER_ROW or LEFT_COLUMN) -> {
+                    return 3
                 }
-                ( CENTER_ROW or RIGHT_COLUMN ) -> {
-                    tileIndex = 5
+                (CENTER_ROW or RIGHT_COLUMN) -> {
+                    return 5
                 }
-                ( BOTTOM_ROW or LEFT_COLUMN ) -> {
-                    tileIndex = 6
+                (BOTTOM_ROW or LEFT_COLUMN) -> {
+                    return 6
                 }
-                ( BOTTOM_ROW or CENTER_COLUMN ) -> {
-                    tileIndex = 7
+                (BOTTOM_ROW or CENTER_COLUMN) -> {
+                    return 7
                 }
-                ( BOTTOM_ROW or RIGHT_COLUMN ) -> {
-                    tileIndex = 8
+                (BOTTOM_ROW or RIGHT_COLUMN) -> {
+                    return 8
                 }
+                else -> return CENTER_TILE_INDEX
             }
-
-            val positionOnTile = pos - mTileOffsets[tileIndex]
-
-            mTiles[tileIndex]!!.addModel(modelName, positionOnTile, rot)
-
-            // change has been made so save it to file.
-            mTiles[tileIndex]!!.saveTileToFile(mContext)
         }
+
+        return null
     }
 }

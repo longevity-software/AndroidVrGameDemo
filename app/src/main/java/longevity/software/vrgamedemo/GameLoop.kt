@@ -41,6 +41,7 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
             val playerLookingAtGround = mPlayerVision.GetPositionPlayerIsLookingOnTheYAxisPlane()
 
             val showObjectPlacer = playerLookingAtGround.first && mTileMap.isPositionValidOnTileMap(playerLookingAtGround.second)
+            val objectOnemptyTile = mTileMap.isPositionOnAnEmptyTile(playerLookingAtGround.second)
 
             mObjectPlacer.adjustObjectPlacer(playerLookingAtGround.second, showObjectPlacer)
 
@@ -62,9 +63,20 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
             }
 
             if ( ButtonControlInterface.ButtonState.PRESSED == mControlHub.getActionButtonState() ) {
-                mTileMap.placeObjectInMap(mObjectPlacer.getModelName(),
-                                            mObjectPlacer.getModelPosition(),
-                                            mObjectPlacer.getModelRotation())
+
+                if (showObjectPlacer) {
+
+                    if (objectOnemptyTile) {
+                        mTileMap.bringTileToLife(playerLookingAtGround.second)
+                    }
+                    else {
+                        mTileMap.placeObjectInMap(
+                            mObjectPlacer.getModelName(),
+                            mObjectPlacer.getModelPosition(),
+                            mObjectPlacer.getModelRotation()
+                        )
+                    }
+                }
             }
 
             val TIME = (System.currentTimeMillis() % MILLISECONDS_IN_A_DAY).toFloat()

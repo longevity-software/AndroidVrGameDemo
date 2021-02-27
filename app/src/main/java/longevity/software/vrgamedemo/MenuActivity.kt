@@ -60,7 +60,6 @@ class MenuActivity : AppCompatActivity() {
 
         updateSelectedMenuItem()
 
-        // TODO - check for empty tile and save if not present.
         val emptyTile = File(this.filesDir, "Empty_tile.vtf")
 
         if ( !emptyTile.exists() ) {

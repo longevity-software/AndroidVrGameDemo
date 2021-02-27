@@ -28,7 +28,7 @@ class Tile(baseModel: String,
 
     private val mModelLoader = modelLoader
 
-    private val mFluidity = if (null == fluidity) { 0.0f } else fluidity
+    private var mFluidity = if (null == fluidity) { 0.0f } else fluidity
 
     private var mModelsHaveNotBeenInitialised = true
 
@@ -36,14 +36,14 @@ class Tile(baseModel: String,
     private var mZOffset = 0.0f
 
     private val mTileName = tileName
-    private val mTileUpAndLeft = upLeft
-    private val mTileStraightUp = straightUp
-    private val mTileUpAndRight = upRight
-    private val mTileStraightLeft = left
-    private val mTileStraightRight = right
-    private val mTileDownAndLeft = downLeft
-    private val mTileStraightDown = straightDown
-    private val mTileDownAndRight = downRight
+    private var mTileUpAndLeft = upLeft
+    private var mTileStraightUp = straightUp
+    private var mTileUpAndRight = upRight
+    private var mTileStraightLeft = left
+    private var mTileStraightRight = right
+    private var mTileDownAndLeft = downLeft
+    private var mTileStraightDown = straightDown
+    private var mTileDownAndRight = downRight
 
     private val mGameOjectData = gameObjectData
 
@@ -157,6 +157,13 @@ class Tile(baseModel: String,
         {
             return mTileName
         }
+    }
+
+    /**
+     * returns true if the tile is empty as detected by having the empty tile name
+     */
+    fun tileIsEmpty() : Boolean {
+        return mEMPTY_TILE_STRING == getTileName()
     }
 
     /**
@@ -294,6 +301,79 @@ class Tile(baseModel: String,
      */
     fun getTileFluidity() : Float {
         return mFluidity
+    }
+
+    /**
+     * Update the base mode
+     */
+    fun setTileBaseModel(model: String) {
+
+        mBaseModel = model
+
+        mModelsHaveNotBeenInitialised = true
+    }
+
+    /**
+     * Updates the tile straight Up
+     */
+    fun setTileStraightUp(name: String) {
+        mTileStraightUp = name
+    }
+
+    /**
+     * Updates the tile straight Down
+     */
+    fun setTileStraightDown(name: String) {
+        mTileStraightDown = name
+    }
+
+    /**
+     * Updates the tile straight Left
+     */
+    fun setTileStraightLeft(name: String) {
+        mTileStraightLeft = name
+    }
+
+    /**
+     * Updates the tile straight Right
+     */
+    fun setTileStraightRight(name: String) {
+        mTileStraightRight = name
+    }
+
+    /**
+     * Updates the tile up and left
+     */
+    fun setTileUpLeft(name: String) {
+        mTileUpAndLeft = name
+    }
+
+    /**
+     * Updates the tile up and right
+     */
+    fun setTileUpRight(name: String) {
+        mTileUpAndRight = name
+    }
+
+    /**
+     * Updates the tile down and left
+     */
+    fun setTileDownLeft(name: String) {
+        mTileDownAndLeft = name
+    }
+
+    /**
+     * Updates the tile down and right
+     */
+    fun setTileDownRight(name: String) {
+        mTileDownAndRight = name
+    }
+
+    /**
+     * Updates the tile fluidity
+     */
+    fun setTileFluidity(fluidity: Float) {
+        mFluidity = fluidity
     }
 
     /**
