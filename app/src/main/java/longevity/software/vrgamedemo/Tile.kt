@@ -10,7 +10,6 @@ class Tile(baseModel: String,
            fluidity: Float,
            gameObjectData: ArrayList<Triple<String, Position3Float, Float>>) : DrawableInterface {
 
-    private val mEMPTY_TILE_STRING = "Empty_tile.vtf"
     private val mBASE_MODEL_INDEX = 0
 
     private var mBaseModel = baseModel
@@ -30,6 +29,18 @@ class Tile(baseModel: String,
     private val mTileName = tileName
 
     private val mGameOjectData = gameObjectData
+
+    companion object Factory {
+        private val mEMPTY_TILE_STRING = "Empty_tile.vtf"
+
+        fun GetEmptyTile(modelLoader: ModelLoader) : Tile = Tile(modelLoader.TILE_EMPTY,
+            "None",
+            modelLoader,
+            mEMPTY_TILE_STRING,
+            0.0f,
+            ArrayList<Triple<String, Position3Float, Float>>()
+        )
+    }
 
     /**
      * Function to initialise the static models

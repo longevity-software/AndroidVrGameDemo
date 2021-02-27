@@ -6,6 +6,9 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
 
     private val MILLISECONDS_IN_A_DAY = 240000
 
+    private val mMOVE_SPEED = 2.0f
+    private val mLOOK_SPEED = 2.0f
+
     private var mRunning = false
 
     private var mScene = glSurfaceView
@@ -32,10 +35,10 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
             mScene.AquireRenderLock()
 
             // process the controls
-            mPlayer.adjustPlayer(mControlHub.getMoveForwardBackDelta(),
-                                    mControlHub.getMoveLeftRightDelta(),
-                                    mControlHub.getLookPitch(),
-                                    mControlHub.getLookYaw(),
+            mPlayer.adjustPlayer(mControlHub.getMoveForwardBackDelta() * mMOVE_SPEED,
+                                    mControlHub.getMoveLeftRightDelta() * mMOVE_SPEED,
+                                    mControlHub.getLookPitch() * mLOOK_SPEED,
+                                    mControlHub.getLookYaw() * mLOOK_SPEED,
                                     mTileMap)
 
             val playerLookingAtGround = mPlayerVision.GetPositionPlayerIsLookingOnTheYAxisPlane()

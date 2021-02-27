@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.io.File
 
 
 class MenuActivity : AppCompatActivity() {
@@ -60,23 +59,11 @@ class MenuActivity : AppCompatActivity() {
 
         updateSelectedMenuItem()
 
-        val emptyTile = File(this.filesDir, "Empty_tile.vtf")
+        val modelLoader = ModelLoader(this)
 
-        if ( !emptyTile.exists() ) {
-
-            val modelLoader = ModelLoader(this)
-            // file doesn't exist so create it.
-
-            val tile = Tile(
-                modelLoader.TILE_EMPTY,
-                "None",
-                modelLoader,
-                "Empty_tile.vtf",
-                0.0f,
-                ArrayList<Triple<String, Position3Float, Float>>()
-            ).also {
+        // make sure empty tile exists
+        val tile = Tile.GetEmptyTile(modelLoader).also {
                 it.saveTileToFile(this)
-            }
         }
     }
 

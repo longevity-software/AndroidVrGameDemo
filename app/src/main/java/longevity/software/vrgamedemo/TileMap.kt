@@ -71,7 +71,7 @@ class TileMap(context: Context, modelLoader: ModelLoader, tile: String) : Drawab
             }
             else {
                 // aw it doesn't exist so use an empty tile
-                mTiles[i] = VrTileFormatParser(mContext, "Empty_tile.vtf", mModelLoader).getParsedTile()
+                mTiles[i] = Tile.GetEmptyTile(mModelLoader)
             }
 
             // finally set the offset
