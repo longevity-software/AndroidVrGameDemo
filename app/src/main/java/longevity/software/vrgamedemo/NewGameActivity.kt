@@ -291,14 +291,6 @@ class NewGameActivity : AppCompatActivity() {
                             "None",
                             modelLoader,
                             newSaveName + "_0_0.vtf",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
                             1.0f,
                             ArrayList<Triple<String, Position3Float, Float>>()).also {
 

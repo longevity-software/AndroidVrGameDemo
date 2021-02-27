@@ -72,14 +72,6 @@ class MenuActivity : AppCompatActivity() {
                 "None",
                 modelLoader,
                 "Empty_tile.vtf",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
                 0.0f,
                 ArrayList<Triple<String, Position3Float, Float>>()
             ).also {

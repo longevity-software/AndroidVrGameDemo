@@ -7,22 +7,11 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
     private var mTile: Tile
 
     init {
-        //val inStream = context.assets.open(file)
-        //val reader = BufferedReader(InputStreamReader(inStream))
-
         val reader = context.openFileInput(file).bufferedReader()
 
         // all the variables for creating a tile
         var baseModel = ""
         var baseRotation = ""
-        var upLeft = ""
-        var straightUp = ""
-        var upRight = ""
-        var left = ""
-        var right = ""
-        var downLeft = ""
-        var straightDown = ""
-        var downRight = ""
         var fluidity = 0.0f
 
         val gameObjects = ArrayList<Triple<String, Position3Float, Float>>()
@@ -43,30 +32,6 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
             else if ( it.startsWith("<BR>" ) ) {
 
                 baseRotation = it.substringAfter("<BR>").substringBefore("</BR>")
-            }
-            else if ( it.startsWith( "<UL>" ) ) {
-                upLeft = it.substringAfter("<UL>").substringBefore("</UL>")
-            }
-            else if ( it.startsWith("<SU>" ) ) {
-                straightUp = it.substringAfter("<SU>").substringBefore("</SU>")
-            }
-            else if ( it.startsWith("<UR>" ) ) {
-                upRight = it.substringAfter("<UR>").substringBefore("</UR>")
-            }
-            else if ( it.startsWith("<SL>" ) ) {
-                left = it.substringAfter("<SL>").substringBefore("</SL>")
-            }
-            else if ( it.startsWith("<SR>" ) ) {
-                right = it.substringAfter("<SR>").substringBefore("</SR>")
-            }
-            else if ( it.startsWith("<DL>" ) ) {
-                downLeft = it.substringAfter("<DL>").substringBefore("</DL>")
-            }
-            else if ( it.startsWith("<SD>" ) ) {
-                straightDown = it.substringAfter("<SD>").substringBefore("</SD>")
-            }
-            else if ( it.startsWith("<DR>" ) ) {
-                downRight = it.substringAfter("<DR>").substringBefore("</DR>")
             }
             else if ( it.startsWith( "<TF>" ) ) {
                 val fluidityString = it.substringAfter("<TF>").substringBefore("</TF>")
@@ -90,7 +55,7 @@ class VrTileFormatParser(context: Context, file: String, modelLoader: ModelLoade
             }
         }
 
-        mTile = Tile(baseModel, baseRotation, modelLoader, file, upLeft, straightUp, upRight, left, right, downLeft, straightDown, downRight, fluidity, gameObjects)
+        mTile = Tile(baseModel, baseRotation, modelLoader, file, fluidity, gameObjects)
     }
 
     /**

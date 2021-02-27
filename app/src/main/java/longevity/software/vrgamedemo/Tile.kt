@@ -7,14 +7,6 @@ class Tile(baseModel: String,
            baseRotation: String,
            modelLoader: ModelLoader,
            tileName: String,
-           upLeft: String,
-           straightUp: String,
-           upRight: String,
-           left: String,
-           right: String,
-           downLeft: String,
-           straightDown: String,
-           downRight: String,
            fluidity: Float,
            gameObjectData: ArrayList<Triple<String, Position3Float, Float>>) : DrawableInterface {
 
@@ -36,14 +28,6 @@ class Tile(baseModel: String,
     private var mZOffset = 0.0f
 
     private val mTileName = tileName
-    private var mTileUpAndLeft = upLeft
-    private var mTileStraightUp = straightUp
-    private var mTileUpAndRight = upRight
-    private var mTileStraightLeft = left
-    private var mTileStraightRight = right
-    private var mTileDownAndLeft = downLeft
-    private var mTileStraightDown = straightDown
-    private var mTileDownAndRight = downRight
 
     private val mGameOjectData = gameObjectData
 
@@ -167,134 +151,6 @@ class Tile(baseModel: String,
     }
 
     /**
-     *  returns a null checked string representing the tile straight up from this one
-     */
-    fun getTileStraightUp() : String {
-
-        if (    ( null == mTileStraightUp )
-            or ( "" == mTileStraightUp )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileStraightUp
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile straight down from this one
-     */
-    fun getTileStraightDown() : String {
-
-        if (    ( null == mTileStraightDown )
-            or ( "" == mTileStraightDown )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileStraightDown
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile straight left from this one
-     */
-    fun getTileStraightLeft() : String {
-
-        if (    ( null == mTileStraightLeft )
-            or ( "" == mTileStraightLeft )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileStraightLeft
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile straight right from this one
-     */
-    fun getTileStraightRight() : String {
-
-        if (    ( null == mTileStraightRight )
-            or ( "" == mTileStraightRight )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileStraightRight
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile up and left from this one
-     */
-    fun getTileUpLeft() : String {
-
-        if (    ( null == mTileUpAndLeft )
-            or ( "" == mTileUpAndLeft )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileUpAndLeft
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile up and right from this one
-     */
-    fun getTileUpRight() : String {
-
-        if (    ( null == mTileUpAndRight )
-            or ( "" == mTileUpAndRight )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileUpAndRight
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile down and left from this one
-     */
-    fun getTileDownLeft() : String {
-
-        if (    ( null == mTileDownAndLeft )
-            or ( "" == mTileDownAndLeft )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileDownAndLeft
-        }
-    }
-
-    /**
-     *  returns a null checked string representing the tile down and right from this one
-     */
-    fun getTileDownRight() : String {
-
-        if (    ( null == mTileDownAndRight )
-            or ( "" == mTileDownAndRight )
-        ) {
-            return mEMPTY_TILE_STRING
-        }
-        else
-        {
-            return mTileDownAndRight
-        }
-    }
-
-    /**
      *  Function to indicate how easily the player can move through the tile.
      *  Fluidity should be a value between 0.0 (player can't move)
      *  and 1.0 (player can move unimpeded)
@@ -311,62 +167,6 @@ class Tile(baseModel: String,
         mBaseModel = model
 
         mModelsHaveNotBeenInitialised = true
-    }
-
-    /**
-     * Updates the tile straight Up
-     */
-    fun setTileStraightUp(name: String) {
-        mTileStraightUp = name
-    }
-
-    /**
-     * Updates the tile straight Down
-     */
-    fun setTileStraightDown(name: String) {
-        mTileStraightDown = name
-    }
-
-    /**
-     * Updates the tile straight Left
-     */
-    fun setTileStraightLeft(name: String) {
-        mTileStraightLeft = name
-    }
-
-    /**
-     * Updates the tile straight Right
-     */
-    fun setTileStraightRight(name: String) {
-        mTileStraightRight = name
-    }
-
-    /**
-     * Updates the tile up and left
-     */
-    fun setTileUpLeft(name: String) {
-        mTileUpAndLeft = name
-    }
-
-    /**
-     * Updates the tile up and right
-     */
-    fun setTileUpRight(name: String) {
-        mTileUpAndRight = name
-    }
-
-    /**
-     * Updates the tile down and left
-     */
-    fun setTileDownLeft(name: String) {
-        mTileDownAndLeft = name
-    }
-
-    /**
-     * Updates the tile down and right
-     */
-    fun setTileDownRight(name: String) {
-        mTileDownAndRight = name
     }
 
     /**
@@ -390,15 +190,6 @@ class Tile(baseModel: String,
 
         context.openFileOutput(mTileName, Context.MODE_PRIVATE).use {
             it.write( ( "<BM>" + mBaseModel + "</BM>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<BR>" + mBaseRotation + "</BR>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<SU>" + getTileStraightUp() + "</SU>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<SD>" + getTileStraightDown() + "</SD>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<SL>" + getTileStraightLeft() + "</SL>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<SR>" + getTileStraightRight() + "</SR>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<UL>" + getTileUpLeft() + "</UL>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<UR>" + getTileUpRight() + "</UR>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<DL>" + getTileDownLeft() + "</DL>" + System.lineSeparator() ).toByteArray() )
-            it.write( ( "<DR>" + getTileDownRight() + "</DR>" + System.lineSeparator() ).toByteArray() )
             it.write( ( "<TF>" + mFluidity.toString() + "</TF>" + System.lineSeparator() ).toByteArray() )
 
             // save any game objects
