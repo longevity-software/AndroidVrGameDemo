@@ -65,6 +65,17 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
                 }
             }
 
+            if ( ButtonControlInterface.ButtonState.PRESSED == mControlHub.getOptionsButtonState()) {
+                if (mTemp == 0) {
+                    mObjectPlacer.setModelToBePlaced("Tree")
+                    mTemp = 1
+                }
+                else {
+                    mObjectPlacer.setModelToBePlaced("Rocks")
+                    mTemp = 0
+                }
+            }
+
             if ( ButtonControlInterface.ButtonState.PRESSED == mControlHub.getActionButtonState() ) {
 
                 if (showObjectPlacer) {
@@ -80,6 +91,10 @@ class GameLoop(glSurfaceView: VrGlSurfaceView, gameControl: GameControlHub, play
                         )
                     }
                 }
+            }
+
+            if ( ButtonControlInterface.ButtonState.PRESSED == mControlHub.getActionButton2State() ) {
+                mTileMap.savePlayersPositionOnTileMap(mPlayer.getPosition())
             }
 
             val TIME = (System.currentTimeMillis() % MILLISECONDS_IN_A_DAY).toFloat()

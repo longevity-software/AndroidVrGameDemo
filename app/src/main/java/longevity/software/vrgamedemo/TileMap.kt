@@ -739,4 +739,14 @@ class TileMap(context: Context, modelLoader: ModelLoader, tile: String) : Drawab
 
         return null
     }
+
+    /**
+     * function to update the game save with the current players position and tile.
+     */
+    fun savePlayersPositionOnTileMap(pos: Position3Float) {
+
+        val db = DatabaseHelper(mContext)
+
+        db.updateSaveGame(mTiles[CENTER_TILE_INDEX]!!.getTileName(), pos)
+    }
 }

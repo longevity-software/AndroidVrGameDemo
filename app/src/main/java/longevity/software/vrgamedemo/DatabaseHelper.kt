@@ -112,9 +112,43 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun getPlayerOffset(saveName: String): Position3Float {
-        return Position3Float(0.0f, 0.0f, 0.0f)
+
+        var pos = Position3Float(0.0f, 0.0f, 0.0f)
+        val db = readableDatabase
+
+        // values to return from the query
+        val projection = arrayOf(
+            SaveDataContract.SaveData.COLUMN_NAME_OFFSET_X,
+            SaveDataContract.SaveData.COLUMN_NAME_OFFSET_Y,
+            SaveDataContract.SaveData.COLUMN_NAME_OFFSET_Z
+        )
+
+        val cursor = db.query(
+            SaveDataContract.SaveData.TABLE_NAME,
+            projection,
+            "${SaveDataContract.SaveData.COLUMN_NAME_NAME} = ?",
+            arrayOf(saveName),
+            null,
+            null,
+            null
+        ).also {
+            with( it ) {
+                if ( it.moveToNext() ) {
+
+                    pos = Position3Float(
+                        it.getString(getColumnIndexOrThrow(SaveDataContract.SaveData.COLUMN_NAME_OFFSET_X)).toFloat(),
+                        it.getString(getColumnIndexOrThrow(SaveDataContract.SaveData.COLUMN_NAME_OFFSET_Y)).toFloat(),
+                        it.getString(getColumnIndexOrThrow(SaveDataContract.SaveData.COLUMN_NAME_OFFSET_Z)).toFloat())
+                }
+            }
+        }
+
+        return pos
     }
 
+    /**
+     * overridden function from the SaveProgressInterface to create a new save game
+     */
     override fun CreateSaveGame(name: String) : Boolean {
 
         val db = writableDatabase
@@ -128,5 +162,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
 
         return -1.toLong() != db.insert(SaveDataContract.SaveData.TABLE_NAME, null, values)
+    }
+
+    /**
+     * overridden function from the SaveProgressInterface to update a save game
+     */
+    override fun updateSaveGame(tile: String, pos: Position3Float) {
+        val db = writableDatabase
+
+        val name = tile.substringBefore("_")
+
+        val values = ContentValues().apply {
+            put(SaveDataContract.SaveData.COLUMN_NAME_TILE, tile)
+            put(SaveDataContract.SaveData.COLUMN_NAME_OFFSET_X, pos.X().toString())
+            put(SaveDataContract.SaveData.COLUMN_NAME_OFFSET_Y, pos.Y().toString())
+            put(SaveDataContract.SaveData.COLUMN_NAME_OFFSET_Z, pos.Z().toString())
+        }
+
+        val selection = "${SaveDataContract.SaveData.COLUMN_NAME_NAME} = ?"
+        val selectionArgs = arrayOf(name)
+
+        val count = db.update(
+            SaveDataContract.SaveData.TABLE_NAME,
+            values,
+            selection,
+            selectionArgs
+        )
     }
 }

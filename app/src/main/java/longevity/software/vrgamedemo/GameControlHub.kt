@@ -55,6 +55,13 @@ class GameControlHub(lookControl: LookControlInterface,
     }
 
     /**
+     * function to get whether the 2nd action button state
+     */
+    fun getActionButton2State(): ButtonControlInterface.ButtonState {
+        return mButtonControl.getActionButton2State()
+    }
+
+    /**
      * function to get whether the R1 button state
      */
     fun getR1ButtonState(): ButtonControlInterface.ButtonState {
@@ -66,5 +73,12 @@ class GameControlHub(lookControl: LookControlInterface,
      */
     fun getL1ButtonState(): ButtonControlInterface.ButtonState {
         return mButtonControl.getL1ButtonState()
+    }
+
+    /**
+     * function to get the state of the options button
+     */
+    fun getOptionsButtonState(): ButtonControlInterface.ButtonState {
+        return mButtonControl.getOptionsButtonState()
     }
 }

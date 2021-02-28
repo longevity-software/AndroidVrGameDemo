@@ -35,6 +35,8 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
     private var mActionButtonState: ButtonControlInterface.ButtonState
     private var mR1ButtonState: ButtonControlInterface.ButtonState
     private var mL1ButtonState: ButtonControlInterface.ButtonState
+    private var mOptionsButtonState: ButtonControlInterface.ButtonState
+    private var mActionButton2State: ButtonControlInterface.ButtonState
 
     /**
      * init function initialises the translation and rotation matrices to an identity matrix.
@@ -53,8 +55,10 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
 
         // buttons are initially not pressed
         mActionButtonState = ButtonControlInterface.ButtonState.IDLE
+        mActionButton2State = ButtonControlInterface.ButtonState.IDLE
         mR1ButtonState = ButtonControlInterface.ButtonState.IDLE
         mL1ButtonState = ButtonControlInterface.ButtonState.IDLE
+        mOptionsButtonState = ButtonControlInterface.ButtonState.IDLE
     }
 
     /**
@@ -171,6 +175,30 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
 
     /**
      *  Overridden function from the ButtonControlInterface
+     *  returns the current state of the 2nd action button.
+     */
+    override fun getActionButton2State(): ButtonControlInterface.ButtonState {
+
+        // lock while we use the action button pressed variable
+        mButtonLock.lock()
+
+        // take a copy of the action button state and then adjust if it is a transitionary state.
+        val state = mActionButton2State
+
+        if ( ButtonControlInterface.ButtonState.PRESSED == mActionButton2State ) {
+            mActionButton2State = ButtonControlInterface.ButtonState.HELD
+        } else if ( ButtonControlInterface.ButtonState.RELEASED == mActionButton2State ) {
+            mActionButton2State = ButtonControlInterface.ButtonState.IDLE
+        }
+
+        // unlock
+        mButtonLock.unlock()
+
+        return state
+    }
+
+    /**
+     *  Overridden function from the ButtonControlInterface
      *  returns the current state of the R1 button.
      */
     override fun getR1ButtonState() : ButtonControlInterface.ButtonState {
@@ -185,6 +213,30 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
             mR1ButtonState = ButtonControlInterface.ButtonState.HELD
         } else if ( ButtonControlInterface.ButtonState.RELEASED == mR1ButtonState ) {
             mR1ButtonState = ButtonControlInterface.ButtonState.IDLE
+        }
+
+        // unlock
+        mButtonLock.unlock()
+
+        return state
+    }
+
+    /**
+     *  Overridden function from the ButtonControlInterface
+     *  returns the current state of the Options button.
+     */
+    override fun getOptionsButtonState(): ButtonControlInterface.ButtonState {
+
+        // lock while we use the options button pressed variable
+        mButtonLock.lock()
+
+        // take a copy of the options button state and then adjust if it is a transitionary state.
+        val state = mOptionsButtonState
+
+        if ( ButtonControlInterface.ButtonState.PRESSED == mOptionsButtonState ) {
+            mOptionsButtonState = ButtonControlInterface.ButtonState.HELD
+        } else if ( ButtonControlInterface.ButtonState.RELEASED == mOptionsButtonState ) {
+            mOptionsButtonState = ButtonControlInterface.ButtonState.IDLE
         }
 
         // unlock
@@ -282,6 +334,15 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                             // unlock
                             mButtonLock.unlock()
                         }
+                        KeyEvent.KEYCODE_BUTTON_X -> {
+                            // lock while the Action button state is updated
+                            mButtonLock.lock()
+
+                            mActionButton2State = ButtonControlInterface.ButtonState.PRESSED
+
+                            // unlock
+                            mButtonLock.unlock()
+                        }
                         KeyEvent.KEYCODE_BUTTON_R1 -> {
                             mButtonLock.lock()
 
@@ -294,6 +355,14 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                             mButtonLock.lock()
 
                             mL1ButtonState = ButtonControlInterface.ButtonState.PRESSED
+
+                            mButtonLock.unlock()
+                        }
+
+                        KeyEvent.KEYCODE_BUTTON_START -> {
+                            mButtonLock.lock()
+
+                            mOptionsButtonState = ButtonControlInterface.ButtonState.PRESSED
 
                             mButtonLock.unlock()
                         }
@@ -335,6 +404,15 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                             // unlock
                             mButtonLock.unlock()
                         }
+                        KeyEvent.KEYCODE_BUTTON_X -> {
+                            // lock while the Action button state is updated
+                            mButtonLock.lock()
+
+                            mActionButton2State = ButtonControlInterface.ButtonState.RELEASED
+
+                            // unlock
+                            mButtonLock.unlock()
+                        }
                         KeyEvent.KEYCODE_BUTTON_R1 -> {
                             mButtonLock.lock()
 
@@ -347,6 +425,15 @@ class XboxController(): MoveControlInterface, LookControlInterface, ButtonContro
                             mButtonLock.lock()
 
                             mL1ButtonState = ButtonControlInterface.ButtonState.RELEASED
+
+                            mButtonLock.unlock()
+                        }
+
+                        KeyEvent.KEYCODE_BUTTON_START -> {
+
+                            mButtonLock.lock()
+
+                            mOptionsButtonState = ButtonControlInterface.ButtonState.RELEASED
 
                             mButtonLock.unlock()
                         }
